@@ -13,7 +13,8 @@ struct Number {
 #[derive(Debug, Copy, Clone)]
 struct Symbol {
     x : usize,
-    y : usize
+    y : usize,
+    possible_gear : bool
 }
 
 struct Field {
@@ -68,7 +69,8 @@ fn parse_field(input : String) -> Field {
             } else if char != '.' {
                 symbols.push(Symbol {
                     x,
-                    y
+                    y,
+                    possible_gear: char == '*'
                 });
             }
         }
@@ -93,11 +95,46 @@ fn check_if_number_is_part_number(number : &Number, symbols : &Vec<Symbol>) -> b
     );
 }
 
+fn check_if_number_is_adjacent_to_symbol(number : Number, symbol : Symbol) -> bool {
+    return symbol.y + 1 >= number.y &&
+        symbol.y <= number.y + 1 &&
+        symbol.x + 1 >= number.x &&
+        symbol.x <= number.x + number.length;
+}
 
+fn get_gear_ratio_if_gear_otherwise_0(gear : Symbol, numbers : &Vec<Number>) -> u32 {
+    if !gear.possible_gear {
+        return 0;
+    }
+
+    let mut num1 : Option<Number> = None;
+    let mut num2 : Option<Number> = None;
+
+    for num in numbers.iter() {
+        if check_if_number_is_adjacent_to_symbol(*num, gear) {
+            if num1.is_none() {
+                num1 = Some(*num);
+            }
+            else if num2.is_none() {
+                num2 = Some(*num);
+            }
+            else {
+                // If this is the third number, this is not a gear
+                return 0;
+            }
+        }
+    }
+
+    if num1.is_some() && num2.is_some() {
+        return num1.unwrap().value * num2.unwrap().value;
+    }
+    return 0;
+}
 
 #[allow(dead_code)]
 pub fn day3() {
     day3_1();
+    day3_2();
 }
 
 pub fn day3_1() {
@@ -119,4 +156,12 @@ pub fn day3_1() {
     assert_eq!(sum, 556367);
     println!("Total amount of Symbols and Numbers: {} / {}", n_symbols, n_numbers);
     println!("Sum of {} valid part numbers: {}", count_valid, sum);
+}
+
+pub fn day3_2() {
+    let input = get_input_or_panic("3-1");
+    let field = parse_field(input);
+
+    let gear_ratios : u32 = field.symbols.into_iter().map(|s| get_gear_ratio_if_gear_otherwise_0(s, &field.numbers)).sum();
+    println!("Sum of gear ratios: {}", gear_ratios);
 }
