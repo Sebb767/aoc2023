@@ -126,7 +126,6 @@ impl Mapper {
 
     fn map_seed_ranges(&self, input : Vec<SeedRange>) -> Vec<SeedRange> {
         let mut result = Vec::new();
-        let mut iter = input.iter();
 
         for seed_range in input.iter() {
             let mut remainder = (*seed_range).clone();
@@ -182,7 +181,7 @@ fn parse_mapper(lines : &mut std::str::Lines) -> Option<Mapper> {
 fn parse_day5_input(input : String) -> Option<DayFiveInput> {
     let mut iter = input.lines();
 
-    let mut seeds : Vec<i64>;
+    let seeds : Vec<i64>;
     {
         let seeds_line = iter.next()?;
         assert!(seeds_line.starts_with("seeds: "));

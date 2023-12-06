@@ -6,6 +6,8 @@ mod day4;
 mod day5;
 mod day6;
 
+use std::env;
+use std::time::Instant;
 #[allow(unused_imports)]
 use crate::day1::day1;
 #[allow(unused_imports)]
@@ -19,6 +21,49 @@ use crate::day5::day5;
 #[allow(unused_imports)]
 use crate::day6::day6;
 
+fn call_day<F>(function : &F, day : usize)
+    where F : Fn() {
+    let spacer = "=========";
+    println!("{spacer} Day {day} {spacer}");
+
+    let start = Instant::now();
+    function();
+    let elapsed = start.elapsed().as_secs_f64();
+
+    println!();
+    println!("# day {day} completed in {elapsed:.3}s");
+}
+
 fn main() {
-    day6();
+    let days = [
+        day1,
+        day2,
+        day3,
+        day4,
+        day5,
+        day6
+    ];
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() > 0 && args.contains(&String::from("--all")) {
+        let mut first = true;
+        let now = Instant::now();
+
+        for (day, function) in days.iter().enumerate() {
+            if first {
+                first = false
+            }
+            else {
+                println!();
+                println!();
+            }
+            call_day(function, day+1);
+        }
+
+        println!("# All days finished after {:.3}s", now.elapsed().as_secs_f64())
+    }
+    else {
+        let current_day = days.last().unwrap();
+        call_day(current_day, days.len());
+    }
 }
