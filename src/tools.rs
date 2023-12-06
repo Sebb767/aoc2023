@@ -1,4 +1,5 @@
 use std::fs;
+use std::str::FromStr;
 
 pub fn get_input(day : &str) -> Result<String, String> {
     let fname = format!("./inputs/day{}.txt", day);
@@ -17,4 +18,9 @@ pub fn get_input_or_panic(day : &str) -> String {
         panic!("{}", result.unwrap_err());
     };
     return result.unwrap();
+}
+
+pub fn string_with_spaces_and_numbers_to_vec_of_numbers<T : FromStr>(input : &str) -> Result<Vec<T>, T::Err> {
+    let parsed : Result<Vec<T>, T::Err> = input.split(" ").map(|s| s.parse()).collect();
+    return parsed;
 }
