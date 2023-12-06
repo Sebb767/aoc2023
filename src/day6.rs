@@ -55,6 +55,30 @@ fn find_n_valid_strategies(race : Race) -> i64 {
         .count() as i64
 }
 
+fn find_n_valid_strategies_fast(race : Race) -> i64 {
+    let mut min : Option<i64> = None;
+    let mut max : Option<i64> = None;
+
+    for possible_min in 1..race.time {
+        if is_button_time_winning(&race, possible_min) {
+            min = Some(possible_min);
+            break;
+        }
+    }
+    assert!(min.is_some());
+
+    for possible_max in (min.unwrap() ..race.time).rev() {
+        if is_button_time_winning(&race, possible_max) {
+            max = Some(possible_max);
+            break;
+        }
+    }
+    assert!(max.is_some());
+    assert!(min <= max);
+
+    return max.unwrap() - min.unwrap() + 1;
+}
+
 fn is_button_time_winning_hof(race : &Race) -> Box<dyn Fn(&i64) -> bool + '_> {
     Box::new(|inp| is_button_time_winning(race, *inp))
 }
@@ -86,7 +110,7 @@ fn day6_1() {
 fn day6_2() {
     let input = get_input_or_panic("6-1");
     let race = parse_race(input);
-    let result = find_n_valid_strategies(race);
+    let result = find_n_valid_strategies_fast(race);
 
     assert_eq!(result, 42515755);
     println!("Possibilities for single race: {result}")
