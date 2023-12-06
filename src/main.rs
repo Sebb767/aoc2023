@@ -4,6 +4,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 #[allow(unused_imports)]
 use crate::day1::day1;
@@ -15,7 +16,9 @@ use crate::day3::day3;
 use crate::day4::day4;
 #[allow(unused_imports)]
 use crate::day5::day5;
+#[allow(unused_imports)]
+use crate::day6::day6;
 
 fn main() {
-    day5();
+    day6();
 }

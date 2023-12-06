@@ -21,6 +21,6 @@ pub fn get_input_or_panic(day : &str) -> String {
 }
 
 pub fn string_with_spaces_and_numbers_to_vec_of_numbers<T : FromStr>(input : &str) -> Result<Vec<T>, T::Err> {
-    let parsed : Result<Vec<T>, T::Err> = input.split(" ").map(|s| s.parse()).collect();
+    let parsed : Result<Vec<T>, T::Err> = input.split(" ").filter(|s| !s.is_empty()).map(|s| s.parse()).collect();
     return parsed;
 }
