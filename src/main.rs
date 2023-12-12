@@ -6,6 +6,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 use std::env;
 use std::time::Instant;
@@ -16,6 +17,7 @@ use crate::day4::day4;
 use crate::day5::day5;
 use crate::day6::day6;
 use crate::day7::day7;
+use crate::day8::day8;
 
 fn call_day<F>(function : &F, day : usize)
     where F : Fn() {
@@ -39,6 +41,7 @@ fn main() {
         day5,
         day6,
         day7,
+        day8,
     ];
     let args: Vec<String> = env::args().collect();
 
