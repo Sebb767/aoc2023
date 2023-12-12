@@ -24,3 +24,13 @@ pub fn string_with_spaces_and_numbers_to_vec_of_numbers<T : FromStr>(input : &st
     let parsed : Result<Vec<T>, T::Err> = input.split(" ").filter(|s| !s.is_empty()).map(|s| s.parse()).collect();
     return parsed;
 }
+
+#[macro_export]
+macro_rules! return_none_unless {
+    ($val:expr $(,)?) => {
+        match $val {
+            true => (),
+            false => return None,
+        }
+    };
+}
