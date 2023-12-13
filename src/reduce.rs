@@ -24,7 +24,7 @@ where
     where
         F: Fn(T, T) -> T,
     {
-        while let Some(next) = self.next() {
+        for next in self.by_ref() {
             start_value = reduce_function(start_value, next);
         }
         start_value

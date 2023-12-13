@@ -41,7 +41,7 @@ fn main() {
     let days = [day1, day2, day3, day4, day5, day6, day7, day8, day9];
     let args: Vec<String> = env::args().collect();
 
-    if args.len() > 0 && args.contains(&String::from("--all")) {
+    if !args.is_empty() && args.contains(&String::from("--all")) {
         let mut first = true;
         let now = Instant::now();
 
