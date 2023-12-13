@@ -20,13 +20,13 @@ fn parse_draw(line: &str) -> Draw {
     let mut green: i32 = 0;
     let mut blue: i32 = 0;
 
-    let parts = line.split(",");
+    let parts = line.split(',');
     assert!(parts.clone().count() > 0); // max three colours
     assert!(parts.clone().count() <= 3);
 
     for part in parts {
         // parts should now be for example ["5", "red"]
-        let mut parts = part.trim().split(" ");
+        let mut parts = part.trim().split(' ');
         assert_eq!(parts.clone().count(), 2);
 
         let value: i32 = parts.next().unwrap().parse().unwrap();
@@ -40,7 +40,7 @@ fn parse_draw(line: &str) -> Draw {
         };
     }
 
-    return Draw { red, green, blue };
+    Draw { red, green, blue }
 }
 
 fn parse_line(line: &str) -> Game {
@@ -60,13 +60,13 @@ fn parse_line(line: &str) -> Game {
     assert!(draws.clone().count() > 0);
     let draws: Vec<Draw> = draws.map(parse_draw).collect();
 
-    return Game { id, draws };
+    Game { id, draws }
 }
 
 fn is_valid_draw(input: &Draw, reference: &Draw) -> bool {
-    return input.blue <= reference.blue
+    input.blue <= reference.blue
         && input.red <= reference.red
-        && input.green <= reference.green;
+        && input.green <= reference.green
 }
 
 fn is_valid_game(input: &Game, reference: &Draw) -> bool {
@@ -92,15 +92,15 @@ fn get_minimum_reference(input: &Game) -> Draw {
         reference_draw.blue = max(reference_draw.blue, draw.blue);
     }
 
-    return reference_draw;
+    reference_draw
 }
 
 fn draw_power(input: &Draw) -> i32 {
-    return input.blue * input.green * input.red;
+    input.blue * input.green * input.red
 }
 
 fn game_power(input: Game) -> i32 {
-    return draw_power(&get_minimum_reference(&input));
+    draw_power(&get_minimum_reference(&input))
 }
 
 fn day2_1() {
