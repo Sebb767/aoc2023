@@ -1,6 +1,6 @@
+use crate::tools::get_input_or_panic;
 use std::collections::HashMap;
 use std::ops::{Div, Mul, Sub};
-use crate::tools::get_input_or_panic;
 
 #[allow(dead_code)]
 pub fn day8() {
@@ -10,15 +10,15 @@ pub fn day8() {
 
 #[derive(Debug, Clone)]
 struct Node {
-    name : String,
-    left : String,
-    right : String,
+    name: String,
+    left: String,
+    right: String,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 enum Direction {
     Left,
-    Right
+    Right,
 }
 
 impl TryFrom<char> for Direction {
@@ -28,15 +28,15 @@ impl TryFrom<char> for Direction {
         match value {
             'R' => Ok(Direction::Right),
             'L' => Ok(Direction::Left),
-            _ => Err(())
+            _ => Err(()),
         }
     }
 }
 
 #[derive(Debug, Clone)]
 struct Input {
-    directions : Directions,
-    nodes : HashMap<String, Node>,
+    directions: Directions,
+    nodes: HashMap<String, Node>,
 }
 
 #[derive(Debug, Clone)]
@@ -56,20 +56,23 @@ impl From<Vec<Direction>> for Directions {
 
 #[derive(Debug, Copy, Clone)]
 struct Path<'a> {
-    current : &'a Node,
-    lookup : &'a HashMap<String, Node>
+    current: &'a Node,
+    lookup: &'a HashMap<String, Node>,
 }
 
 #[derive(Debug)]
 struct Loop {
-    offset : usize,
-    length : usize,
+    offset: usize,
+    length: usize,
 }
 
 type PathError = ();
 impl Path<'_> {
-    fn new<'a>(start : &'a Node, lookup : &'a HashMap<String, Node>) -> Path<'a> {
-        return Path { current: start, lookup };
+    fn new<'a>(start: &'a Node, lookup: &'a HashMap<String, Node>) -> Path<'a> {
+        return Path {
+            current: start,
+            lookup,
+        };
     }
     fn advance(&mut self, direction: Direction) -> Result<(), PathError> {
         let next = self.current.lookup(direction, &self.lookup);
@@ -78,7 +81,7 @@ impl Path<'_> {
             Ok(())
         } else {
             Err(())
-        }
+        };
     }
 
     fn is_end_node(&self) -> bool {
@@ -93,7 +96,7 @@ impl Path<'_> {
         // pathing loop
         let mut visited = HashMap::<(&String, usize), usize>::new();
         let mut steps = 0;
-        let mut end_node_offset : Option<usize> = None;
+        let mut end_node_offset: Option<usize> = None;
 
         // We will loop until we find the first visited node
         while let Some(dir) = directions.next() {
@@ -101,8 +104,7 @@ impl Path<'_> {
                 if end_node_offset.is_some() {
                     // turns out this doesn't happen, making the whole thing a lot easier
                     panic!("Found loop with multiple end nodes!");
-                }
-                else {
+                } else {
                     end_node_offset = Some(steps);
                 }
             }
@@ -123,15 +125,12 @@ impl Path<'_> {
                     offset: end_node_offset.unwrap(),
                     length: steps - *offset,
                 });
-            }
-            else if steps > limit {
+            } else if steps > limit {
                 // we found no loop, give up
                 break;
-            }
-            else {
+            } else {
                 visited.insert(key, steps);
             }
-
 
             Self::advance(&mut copy, dir).expect("Failed to advance!");
             steps += 1;
@@ -173,7 +172,11 @@ impl Node {
         })
     }
 
-    fn lookup<'a>(&'a self, direction: Direction, lookup: &'a HashMap<String, Node>) -> Option<&Node> {
+    fn lookup<'a>(
+        &'a self,
+        direction: Direction,
+        lookup: &'a HashMap<String, Node>,
+    ) -> Option<&Node> {
         lookup.get(&*match direction {
             Direction::Left => &self.left,
             Direction::Right => &self.right,
@@ -181,8 +184,7 @@ impl Node {
     }
 }
 
-
-fn parse_input(input : &String) -> Option<Input> {
+fn parse_input(input: &String) -> Option<Input> {
     let mut lines = input.lines();
     assert!(lines.clone().count() > 3);
     let directions = lines
@@ -202,7 +204,7 @@ fn parse_input(input : &String) -> Option<Input> {
         nodes.insert(node.name.clone(), node);
     }
 
-    Some(Input { directions , nodes })
+    Some(Input { directions, nodes })
 }
 
 fn follow_directions(mut input: Input) -> Option<u64> {
@@ -212,7 +214,10 @@ fn follow_directions(mut input: Input) -> Option<u64> {
     while counter < limit {
         current_node = current_node
             .lookup(input.directions.next()?, &input.nodes)
-            .expect(&*format!("We have reached an unknown node: {:?}!", current_node));
+            .expect(&*format!(
+                "We have reached an unknown node: {:?}!",
+                current_node
+            ));
         counter += 1;
 
         if current_node.name == "ZZZ" {
@@ -224,7 +229,9 @@ fn follow_directions(mut input: Input) -> Option<u64> {
 }
 
 fn follow_ghost_directions(input: Input) -> Option<usize> {
-    let loops = input.nodes.iter()
+    let loops = input
+        .nodes
+        .iter()
         .filter(|(_, node)| node.name.chars().nth(2).unwrap() == 'A')
         .map(|(_, node)| Path::new(node, &input.nodes))
         .map(|path| path.find_loop(input.directions.clone()))
@@ -235,25 +242,33 @@ fn follow_ghost_directions(input: Input) -> Option<usize> {
     assert!(loops.iter().all(|l| l.offset == l.length));
 
     // Now we just need to find the lowest common denominator
-    let lcm = loops.iter()
+    let lcm = loops
+        .iter()
         .map(|l| l.length)
         .reduce(lowest_common_multiple)?;
 
     Some(lcm)
 }
 
-fn lowest_common_multiple<T>(a : T, b : T) -> T
-    where T : Eq,
-          T : Ord,
-          T : Sub<Output = T>,
-          T : Mul<Output = T>,
-          T : Div<Output = T>,
-          T : Copy {
+fn lowest_common_multiple<T>(a: T, b: T) -> T
+where
+    T: Eq,
+    T: Ord,
+    T: Sub<Output = T>,
+    T: Mul<Output = T>,
+    T: Div<Output = T>,
+    T: Copy,
+{
     (a * b) / greatest_common_divisor(a, b)
 }
 
-fn greatest_common_divisor<T>(mut a : T, mut b : T) -> T
-    where T : Eq, T : Ord, T : Sub<Output=T>, T : Copy {
+fn greatest_common_divisor<T>(mut a: T, mut b: T) -> T
+where
+    T: Eq,
+    T: Ord,
+    T: Sub<Output = T>,
+    T: Copy,
+{
     while a != b {
         if b > a {
             (b, a) = (a, b);

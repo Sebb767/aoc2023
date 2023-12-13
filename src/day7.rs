@@ -1,13 +1,13 @@
+use crate::return_none_unless;
+use crate::tools::get_input_or_panic;
 use std::cmp::Ordering;
 use std::fmt::Display;
 use std::marker::PhantomData;
-use crate::return_none_unless;
-use crate::tools::get_input_or_panic;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 struct Card {
-    sign : char,
-    value : Bid,
+    sign: char,
+    value: Bid,
 }
 
 impl PartialEq<Bid> for Card {
@@ -17,18 +17,17 @@ impl PartialEq<Bid> for Card {
 }
 
 impl Card {
-    const CARD_CHARS : &'static str = "23456789TJQKA";
-    const JOKER : Bid = 11;
+    const CARD_CHARS: &'static str = "23456789TJQKA";
+    const JOKER: Bid = 11;
 
-    fn new(sign : char) -> Option<Card> {
+    fn new(sign: char) -> Option<Card> {
         let value_index = Self::CARD_CHARS.find(sign)?;
         Some(Card {
             sign,
-            value: (value_index as Bid) + 2
+            value: (value_index as Bid) + 2,
         })
     }
 }
-
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
 enum HandType {
@@ -41,34 +40,33 @@ enum HandType {
     FiveOfAKind,
 }
 
-
 type CardStack = [Card; 5];
 type Bid = u32;
 
-
 #[derive(Debug)]
 struct Hand {
-    cards : String,
-    bid : Bid,
+    cards: String,
+    bid: Bid,
 }
 
 #[derive(Debug)]
-struct AnalyzedHand<T : CardComparer> {
-    cards : CardStack,
-    bid : Bid,
-    hand_type : HandType,
-    _marker : PhantomData<T>
+struct AnalyzedHand<T: CardComparer> {
+    cards: CardStack,
+    bid: Bid,
+    hand_type: HandType,
+    _marker: PhantomData<T>,
 }
 
 trait CardComparer {
-    fn cmp(a : &Card, b : &Card) -> Ordering;
+    fn cmp(a: &Card, b: &Card) -> Ordering;
     fn analyze_stack(card_stack: CardStack) -> HandType;
 }
 
-impl<T : CardComparer> AnalyzedHand<T> {
-    fn new(hand : &Hand) -> Option<AnalyzedHand<T>> {
+impl<T: CardComparer> AnalyzedHand<T> {
+    fn new(hand: &Hand) -> Option<AnalyzedHand<T>> {
         return_none_unless!(hand.cards.len() == 5);
-        let cards : CardStack = hand.cards
+        let cards: CardStack = hand
+            .cards
             .chars()
             .map(Card::new)
             .collect::<Option<Vec<Card>>>()?
@@ -80,34 +78,33 @@ impl<T : CardComparer> AnalyzedHand<T> {
             cards,
             hand_type,
             bid: hand.bid,
-            _marker: PhantomData
+            _marker: PhantomData,
         })
     }
-
 }
 
-impl<T : CardComparer> Eq for AnalyzedHand<T> {}
+impl<T: CardComparer> Eq for AnalyzedHand<T> {}
 
-impl<T : CardComparer> PartialEq<Self> for AnalyzedHand<T> {
+impl<T: CardComparer> PartialEq<Self> for AnalyzedHand<T> {
     fn eq(&self, other: &Self) -> bool {
         return self.cmp(other).is_eq();
     }
 }
 
-impl<T : CardComparer> PartialOrd<Self> for AnalyzedHand<T> {
+impl<T: CardComparer> PartialOrd<Self> for AnalyzedHand<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         return Some(self.cmp(other));
     }
 }
 
-impl<T : CardComparer> Ord for AnalyzedHand<T> {
+impl<T: CardComparer> Ord for AnalyzedHand<T> {
     fn cmp(&self, other: &Self) -> Ordering {
         let type_order = self.hand_type.cmp(&other.hand_type);
         if type_order.is_eq() {
             for i in 0..5 {
                 let card_order = <T as CardComparer>::cmp(&self.cards[i], &other.cards[i]);
                 if !card_order.is_eq() {
-                    return card_order
+                    return card_order;
                 }
             }
         }
@@ -115,22 +112,21 @@ impl<T : CardComparer> Ord for AnalyzedHand<T> {
     }
 }
 
-
-impl<T : CardComparer> Display for AnalyzedHand<T> {
+impl<T: CardComparer> Display for AnalyzedHand<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let stack : String = self.cards.clone().map(|c| c.sign).iter().collect();
+        let stack: String = self.cards.clone().map(|c| c.sign).iter().collect();
         write!(f, "{stack} -> {:?} with bid {}", self.hand_type, self.bid)
     }
 }
 
-fn parse_input_to_analyzed_hand<T : CardComparer>(input : String) -> Option<Vec<AnalyzedHand<T>>> {
+fn parse_input_to_analyzed_hand<T: CardComparer>(input: String) -> Option<Vec<AnalyzedHand<T>>> {
     input
         .lines()
         .map(|line| {
             assert!(line.len() >= 7); // at least 5 chars, a space and a bid of at least 1
             AnalyzedHand::new(&Hand {
                 cards: line[0..5].to_string(),
-                bid: line[6..].parse().ok()?
+                bid: line[6..].parse().ok()?,
             })
         })
         .collect()
@@ -146,13 +142,12 @@ impl CardComparer for SimpleAnalyzer {
     fn analyze_stack(mut card_stack: CardStack) -> HandType {
         card_stack.sort_by(Self::cmp);
 
-        let mut counts = [ 1, 1, 1 ];
+        let mut counts = [1, 1, 1];
         let mut offset = 0;
         for i in 1..5 {
-            if &card_stack[i-1] == &card_stack[i] {
+            if &card_stack[i - 1] == &card_stack[i] {
                 counts[offset] += 1;
-            }
-            else {
+            } else {
                 assert!(offset <= 2);
                 if offset == 2 {
                     // This might be the last or second to last card (otherwise offset could not have
@@ -163,18 +158,15 @@ impl CardComparer for SimpleAnalyzer {
                         // all previous cards were distinct. This only leaves two options:
                         return if &card_stack[3] == &card_stack[4] {
                             HandType::OnePair
-                        }
-                        else {
+                        } else {
                             HandType::HighCard
                         };
-                    }
-                    else {
+                    } else {
                         // We're at the last card and it's equal to nothing that came before. So we
                         // don't need to do anything. Not even break, since it's the last iteration
                         // anyway :)
                     }
-                }
-                else {
+                } else {
                     // We do not need to increase count in this case since we initialized it with one
                     offset += 1;
                 }
@@ -185,13 +177,16 @@ impl CardComparer for SimpleAnalyzer {
         counts.sort();
 
         match counts {
-            [ 1, 1, 5 ] => HandType::FiveOfAKind,
-            [ 1, 1, 4 ] => HandType::FourOfAKind,
-            [ 1, 2, 3 ] => HandType::FullHouse,
-            [ 1, 1, 3 ] => HandType::ThreeOfAKind,
-            [ 1, 2, 2 ] => HandType::TwoPair,
-            [ 1, 1, 2 ] => HandType::OnePair,
-            _ => panic!("This should not happen! Cards {:?} counts {:?}", card_stack, counts)
+            [1, 1, 5] => HandType::FiveOfAKind,
+            [1, 1, 4] => HandType::FourOfAKind,
+            [1, 2, 3] => HandType::FullHouse,
+            [1, 1, 3] => HandType::ThreeOfAKind,
+            [1, 2, 2] => HandType::TwoPair,
+            [1, 1, 2] => HandType::OnePair,
+            _ => panic!(
+                "This should not happen! Cards {:?} counts {:?}",
+                card_stack, counts
+            ),
         }
     }
 }
@@ -200,17 +195,20 @@ struct JokerAwareAnalyzer;
 
 impl JokerAwareAnalyzer {
     fn stack_without_joker(card_stack: &CardStack) -> Vec<&Card> {
-        card_stack.iter().filter(|c| c.value != Card::JOKER).collect()
+        card_stack
+            .iter()
+            .filter(|c| c.value != Card::JOKER)
+            .collect()
     }
 }
 
 impl CardComparer for JokerAwareAnalyzer {
     fn cmp(a: &Card, b: &Card) -> Ordering {
         match (a.value, b.value) {
-            ( Card::JOKER, Card::JOKER ) => Ordering::Equal,
-            ( _, Card::JOKER ) => Ordering::Greater,
-            ( Card::JOKER, _ ) => Ordering::Less,
-            _ => a.value.cmp(&b.value)
+            (Card::JOKER, Card::JOKER) => Ordering::Equal,
+            (_, Card::JOKER) => Ordering::Greater,
+            (Card::JOKER, _) => Ordering::Less,
+            _ => a.value.cmp(&b.value),
         }
     }
 
@@ -219,18 +217,15 @@ impl CardComparer for JokerAwareAnalyzer {
         if min_stack.len() == 5 {
             // no jokers - the old rules apply
             return SimpleAnalyzer::analyze_stack(card_stack);
-        }
-        else if min_stack.len() < 2 {
+        } else if min_stack.len() < 2 {
             // if we only have jokers or jokers plus one card, we go for five of a kind
             return HandType::FiveOfAKind;
-        }
-        else if min_stack.len() == 2 {
+        } else if min_stack.len() == 2 {
             // If we have two non-jokers, we can still make five of a kind if those are equal. If
             // they aren't, we go for four of a kind, as it is the next highest
             return if min_stack[0] == min_stack[1] {
                 HandType::FiveOfAKind
-            }
-            else {
+            } else {
                 HandType::FourOfAKind
             };
         }
@@ -245,17 +240,18 @@ impl CardComparer for JokerAwareAnalyzer {
              */
             let a = min_stack[0] == min_stack[1];
             return if min_stack[1] == min_stack[2] {
-                if a { HandType::FiveOfAKind } else { HandType::FourOfAKind }
-            }
-            else if a || min_stack[0] == min_stack[2] {
+                if a {
+                    HandType::FiveOfAKind
+                } else {
+                    HandType::FourOfAKind
+                }
+            } else if a || min_stack[0] == min_stack[2] {
                 HandType::FourOfAKind
-            }
-            else {
+            } else {
                 // no pair
                 HandType::ThreeOfAKind
             };
-        }
-        else {
+        } else {
             assert_eq!(min_stack.len(), 4);
             /*
             Let's see:
@@ -273,7 +269,7 @@ impl CardComparer for JokerAwareAnalyzer {
                 HandType::TwoPair => HandType::FullHouse,
                 HandType::OnePair => HandType::ThreeOfAKind,
                 HandType::HighCard => HandType::OnePair,
-                _ => unreachable!("This should not happen!")
+                _ => unreachable!("This should not happen!"),
             };
         }
 
@@ -284,7 +280,7 @@ impl CardComparer for JokerAwareAnalyzer {
     }
 }
 
-fn score_hands<T : CardComparer>(hands : &mut Vec<AnalyzedHand<T>>) -> Vec<Bid> {
+fn score_hands<T: CardComparer>(hands: &mut Vec<AnalyzedHand<T>>) -> Vec<Bid> {
     hands.sort();
     // With the hands sorted in ascending order, calculating the scores is easy
     hands
@@ -297,7 +293,6 @@ fn score_hands<T : CardComparer>(hands : &mut Vec<AnalyzedHand<T>>) -> Vec<Bid> 
         .collect()
 }
 
-
 #[allow(dead_code)]
 pub fn day7() {
     day7_1();
@@ -308,7 +303,7 @@ fn day7_1() {
     let input = get_input_or_panic("7-1");
     let mut parsed = parse_input_to_analyzed_hand::<SimpleAnalyzer>(input).unwrap();
     let score = score_hands(&mut parsed);
-    let result : Bid = score.iter().sum();
+    let result: Bid = score.iter().sum();
 
     assert_eq!(result, 251029473);
     println!("Sum of all scores: {result}");
@@ -319,7 +314,7 @@ fn day7_2() {
 
     let mut parsed = parse_input_to_analyzed_hand::<JokerAwareAnalyzer>(input).unwrap();
     let score = score_hands(&mut parsed);
-    let result : Bid = score.iter().sum();
+    let result: Bid = score.iter().sum();
 
     //assert_eq!(result, 251029473);
     println!("Sum of all scores: {result}");

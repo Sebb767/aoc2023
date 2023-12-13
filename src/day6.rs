@@ -3,10 +3,10 @@ use crate::tools::{get_input_or_panic, string_with_spaces_and_numbers_to_vec_of_
 #[derive(Debug)]
 struct Race {
     time: i64,
-    distance: i64
+    distance: i64,
 }
 
-fn parse_races(input : String) -> Vec<Race> {
+fn parse_races(input: String) -> Vec<Race> {
     let mut lines = input.lines();
     let times = lines.next().unwrap();
     let distances = lines.next().unwrap();
@@ -15,8 +15,9 @@ fn parse_races(input : String) -> Vec<Race> {
     assert!(distances.starts_with("Distance:   "));
     assert_eq!(lines.next(), None);
 
-    let times : Vec<i64> = string_with_spaces_and_numbers_to_vec_of_numbers(&times[12..]).unwrap();
-    let distances : Vec<i64> = string_with_spaces_and_numbers_to_vec_of_numbers(&distances[12..]).unwrap();
+    let times: Vec<i64> = string_with_spaces_and_numbers_to_vec_of_numbers(&times[12..]).unwrap();
+    let distances: Vec<i64> =
+        string_with_spaces_and_numbers_to_vec_of_numbers(&distances[12..]).unwrap();
     assert!(times.len() > 0);
     assert_eq!(times.len(), distances.len());
 
@@ -26,14 +27,16 @@ fn parse_races(input : String) -> Vec<Race> {
 
     while let Some(time) = times_iter.next() {
         let distance = distances_iter.next().unwrap();
-        result.push(Race { time: *time, distance: *distance })
+        result.push(Race {
+            time: *time,
+            distance: *distance,
+        })
     }
 
     result
 }
 
-
-fn parse_race(input : String) -> Race {
+fn parse_race(input: String) -> Race {
     let mut lines = input.lines();
     let times = lines.next().unwrap();
     let distances = lines.next().unwrap();
@@ -42,22 +45,22 @@ fn parse_race(input : String) -> Race {
     assert!(distances.starts_with("Distance:   "));
     assert_eq!(lines.next(), None);
 
-    let time : i64 = times[12..].replace(" ", "").parse().unwrap();
-    let distance : i64 = distances[12..].replace(" ", "").parse().unwrap();
+    let time: i64 = times[12..].replace(" ", "").parse().unwrap();
+    let distance: i64 = distances[12..].replace(" ", "").parse().unwrap();
 
     return Race { time, distance };
 }
 
-fn find_n_valid_strategies(race : Race) -> i64 {
+fn find_n_valid_strategies(race: Race) -> i64 {
     // 0 is never valid and neither is max len
-    ( 1..race.time )
+    (1..race.time)
         .filter(is_button_time_winning_hof(&race))
         .count() as i64
 }
 
-fn find_n_valid_strategies_fast(race : Race) -> i64 {
-    let mut min : Option<i64> = None;
-    let mut max : Option<i64> = None;
+fn find_n_valid_strategies_fast(race: Race) -> i64 {
+    let mut min: Option<i64> = None;
+    let mut max: Option<i64> = None;
 
     for possible_min in 1..race.time {
         if is_button_time_winning(&race, possible_min) {
@@ -67,7 +70,7 @@ fn find_n_valid_strategies_fast(race : Race) -> i64 {
     }
     assert!(min.is_some());
 
-    for possible_max in (min.unwrap() ..race.time).rev() {
+    for possible_max in (min.unwrap()..race.time).rev() {
         if is_button_time_winning(&race, possible_max) {
             max = Some(possible_max);
             break;
@@ -79,11 +82,11 @@ fn find_n_valid_strategies_fast(race : Race) -> i64 {
     return max.unwrap() - min.unwrap() + 1;
 }
 
-fn is_button_time_winning_hof(race : &Race) -> Box<dyn Fn(&i64) -> bool + '_> {
+fn is_button_time_winning_hof(race: &Race) -> Box<dyn Fn(&i64) -> bool + '_> {
     Box::new(|inp| is_button_time_winning(race, *inp))
 }
 
-fn is_button_time_winning(race : &Race, button_time : i64) -> bool {
+fn is_button_time_winning(race: &Race, button_time: i64) -> bool {
     assert!(race.time >= button_time);
     let drive_time = race.time - button_time;
     let dist = drive_time * button_time /* a.k.a. speed */;
@@ -100,8 +103,8 @@ fn day6_1() {
     let input = get_input_or_panic("6-1");
     let races = parse_races(input);
     let n_races = races.len();
-    let n_winning_strategies : Vec<i64> = races.into_iter().map(find_n_valid_strategies).collect();
-    let result : i64 = n_winning_strategies.iter().product();
+    let n_winning_strategies: Vec<i64> = races.into_iter().map(find_n_valid_strategies).collect();
+    let result: i64 = n_winning_strategies.iter().product();
 
     assert_eq!(result, 500346);
     println!("Product of possibilities for {n_races} races: {result}");

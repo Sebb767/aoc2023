@@ -23,16 +23,18 @@ pub fn day1_2() {
     assert_eq!(sum, 52834);
 }
 
-fn summer<F>(input : String, line_parser : F) -> i32 where F: Fn(&str) -> Option<i32> {
-    let mut sum : i32 = 0;
+fn summer<F>(input: String, line_parser: F) -> i32
+where
+    F: Fn(&str) -> Option<i32>,
+{
+    let mut sum: i32 = 0;
     for line in input.lines() {
         let result = line_parser(line);
         if result.is_some() {
             let result = result.unwrap();
             sum += result;
             //println!("Line {} -> {} (sum: {})", line, result, sum);
-        }
-        else {
+        } else {
             println!("Line {} -> ()", line);
         }
     }
@@ -43,20 +45,11 @@ fn summer<F>(input : String, line_parser : F) -> i32 where F: Fn(&str) -> Option
 // Technically, we'd also need to return how much to advance the string by
 // But no digit as word will be valid with the first character cut, so we can always lazily advance
 // by one.
-fn string_to_next_digit(input : &str) -> Option<i32> {
+fn string_to_next_digit(input: &str) -> Option<i32> {
     assert!(input.len() > 0);
 
     let digit_words = [
-        "zero",
-        "one",
-        "two",
-        "three",
-        "four",
-        "five",
-        "six",
-        "seven",
-        "eight",
-        "nine"
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     ];
     let digits = "0123456789";
 
@@ -73,18 +66,17 @@ fn string_to_next_digit(input : &str) -> Option<i32> {
     return Option::None;
 }
 
-fn parse_line_advanced(line : &str) -> Option<i32> {
-    let mut first : Option<i32> = Option::None;
-    let mut last : Option<i32> = Option::None;
+fn parse_line_advanced(line: &str) -> Option<i32> {
+    let mut first: Option<i32> = Option::None;
+    let mut last: Option<i32> = Option::None;
 
-    for offset in 0 .. line.len() {
+    for offset in 0..line.len() {
         let digit = string_to_next_digit(&line[offset..]);
         if digit.is_some() {
             if first.is_none() {
                 first = digit.clone();
                 last = digit;
-            }
-            else {
+            } else {
                 last = digit;
             }
         }
@@ -93,19 +85,18 @@ fn parse_line_advanced(line : &str) -> Option<i32> {
     combine_digits(first, last)
 }
 
-fn parse_line(line : &str) -> Option<i32> {
+fn parse_line(line: &str) -> Option<i32> {
     let digits = "0123456789";
-    let mut first : Option<i32> = Option::None;
-    let mut last : Option<i32> = Option::None;
+    let mut first: Option<i32> = Option::None;
+    let mut last: Option<i32> = Option::None;
 
     for char in line.chars() {
         let digit_result = digits.find(char);
         if digit_result.is_some() {
-            let digit : Option<i32> = Some(digit_result.unwrap() as i32);
+            let digit: Option<i32> = Some(digit_result.unwrap() as i32);
             if first.is_none() {
                 first = digit;
-            }
-            else {
+            } else {
                 last = digit;
             }
         }
@@ -114,7 +105,7 @@ fn parse_line(line : &str) -> Option<i32> {
     combine_digits(first, last)
 }
 
-fn combine_digits(first : Option<i32>, last : Option<i32>) -> Option<i32> {
+fn combine_digits(first: Option<i32>, last: Option<i32>) -> Option<i32> {
     let fdigit = first?;
     let result = match last {
         Some(ldigit) => (fdigit * 10) + ldigit,

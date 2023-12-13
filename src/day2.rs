@@ -1,5 +1,5 @@
-use std::cmp::max;
 use crate::tools::get_input_or_panic;
+use std::cmp::max;
 
 struct Draw {
     red: i32,
@@ -12,13 +12,13 @@ struct Game {
     draws: Vec<Draw>,
 }
 
-fn parse_draw(line : &str) -> Draw {
+fn parse_draw(line: &str) -> Draw {
     // Input:
     // "2 green, 1 blue"
     // "1 red, 2 green, 4 blue"
-    let mut red : i32 = 0;
-    let mut green : i32 = 0;
-    let mut blue : i32 = 0;
+    let mut red: i32 = 0;
+    let mut green: i32 = 0;
+    let mut blue: i32 = 0;
 
     let parts = line.split(",");
     assert!(parts.clone().count() > 0); // max three colours
@@ -29,7 +29,7 @@ fn parse_draw(line : &str) -> Draw {
         let mut parts = part.trim().split(" ");
         assert_eq!(parts.clone().count(), 2);
 
-        let value : i32 = parts.next().unwrap().parse().unwrap();
+        let value: i32 = parts.next().unwrap().parse().unwrap();
         let colour = parts.next().unwrap();
 
         match colour {
@@ -40,14 +40,10 @@ fn parse_draw(line : &str) -> Draw {
         };
     }
 
-    return Draw {
-        red,
-        green,
-        blue
-    };
+    return Draw { red, green, blue };
 }
 
-fn parse_line(line : &str) -> Game {
+fn parse_line(line: &str) -> Game {
     // "Game 68: 1 red, 3 green; 1 blue; 2 green; 3 red, 1 blue; 1 green, 3 red, 2 blue"
     assert!(line.starts_with("Game "));
     let mut parts = line.split(": ");
@@ -62,21 +58,18 @@ fn parse_line(line : &str) -> Game {
     // parse the draws
     let draws = draws.split("; ");
     assert!(draws.clone().count() > 0);
-    let draws : Vec<Draw> = draws.map(parse_draw).collect();
+    let draws: Vec<Draw> = draws.map(parse_draw).collect();
 
-    return Game {
-        id,
-        draws
-    };
+    return Game { id, draws };
 }
 
-fn is_valid_draw(input : &Draw, reference : &Draw) -> bool {
-    return input.blue <= reference.blue &&
-        input.red <= reference.red &&
-        input.green <= reference.green;
+fn is_valid_draw(input: &Draw, reference: &Draw) -> bool {
+    return input.blue <= reference.blue
+        && input.red <= reference.red
+        && input.green <= reference.green;
 }
 
-fn is_valid_game(input : &Game, reference : &Draw) -> bool {
+fn is_valid_game(input: &Game, reference: &Draw) -> bool {
     return input.draws.iter().all(|d| is_valid_draw(d, reference));
 }
 
@@ -86,11 +79,11 @@ pub fn day2() {
     day2_2();
 }
 
-fn get_minimum_reference(input : &Game) -> Draw {
+fn get_minimum_reference(input: &Game) -> Draw {
     let mut reference_draw = Draw {
         red: 0,
         blue: 0,
-        green: 0
+        green: 0,
     };
 
     for draw in input.draws.iter() {
@@ -102,11 +95,11 @@ fn get_minimum_reference(input : &Game) -> Draw {
     return reference_draw;
 }
 
-fn draw_power(input : &Draw) -> i32 {
+fn draw_power(input: &Draw) -> i32 {
     return input.blue * input.green * input.red;
 }
 
-fn game_power(input : Game) -> i32 {
+fn game_power(input: Game) -> i32 {
     return draw_power(&get_minimum_reference(&input));
 }
 
@@ -114,14 +107,17 @@ fn day2_1() {
     let refernce = Draw {
         red: 12,
         green: 13,
-        blue: 14
+        blue: 14,
     };
 
     let input = get_input_or_panic("2-1");
-    let lines : Vec<&str> = input.lines().collect();
-    let games : Vec<Game> = lines.into_iter().map(parse_line).collect();
-    let valid_games : Vec<Game> = games.into_iter().filter(|g| is_valid_game(g, &refernce)).collect();
-    let sum : i32 = valid_games.into_iter().map(|g| g.id).sum();
+    let lines: Vec<&str> = input.lines().collect();
+    let games: Vec<Game> = lines.into_iter().map(parse_line).collect();
+    let valid_games: Vec<Game> = games
+        .into_iter()
+        .filter(|g| is_valid_game(g, &refernce))
+        .collect();
+    let sum: i32 = valid_games.into_iter().map(|g| g.id).sum();
 
     assert_eq!(sum, 2720);
     println!("Sum of ids of valid games: {}", sum);
@@ -129,10 +125,10 @@ fn day2_1() {
 
 fn day2_2() {
     let input = get_input_or_panic("2-1");
-    let lines : Vec<&str> = input.lines().collect();
-    let games : Vec<Game> = lines.into_iter().map(parse_line).collect();
-    let powers : Vec<i32> = games.into_iter().map(game_power).collect();
-    let sum : i32 = powers.into_iter().sum();
+    let lines: Vec<&str> = input.lines().collect();
+    let games: Vec<Game> = lines.into_iter().map(parse_line).collect();
+    let powers: Vec<i32> = games.into_iter().map(game_power).collect();
+    let sum: i32 = powers.into_iter().sum();
 
     assert_eq!(sum, 71535);
     println!("Sum of powers of games: {}", sum);
