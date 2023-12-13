@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::ops::{Div, Mul, Sub};
 use crate::tools::get_input_or_panic;
 
 #[allow(dead_code)]
@@ -7,14 +8,14 @@ pub fn day8() {
     day8_2();
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Node {
     name : String,
     left : String,
     right : String,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 enum Direction {
     Left,
     Right
@@ -32,6 +33,7 @@ impl TryFrom<char> for Direction {
     }
 }
 
+#[derive(Debug, Clone)]
 struct Input {
     directions : Directions,
     nodes : HashMap<String, Node>,
@@ -40,9 +42,102 @@ struct Input {
 #[derive(Debug, Clone)]
 struct Directions(Vec<Direction>, usize);
 
+impl Directions {
+    fn get_offset(&self) -> usize {
+        return self.1;
+    }
+}
+
 impl From<Vec<Direction>> for Directions {
     fn from(value: Vec<Direction>) -> Self {
         Directions(value, 0)
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
+struct Path<'a> {
+    current : &'a Node,
+    lookup : &'a HashMap<String, Node>
+}
+
+#[derive(Debug)]
+struct Loop {
+    offset : usize,
+    length : usize,
+}
+
+type PathError = ();
+impl Path<'_> {
+    fn new<'a>(start : &'a Node, lookup : &'a HashMap<String, Node>) -> Path<'a> {
+        return Path { current: start, lookup };
+    }
+    fn advance(&mut self, direction: Direction) -> Result<(), PathError> {
+        let next = self.current.lookup(direction, &self.lookup);
+        return if let Some(next) = next {
+            self.current = next;
+            Ok(())
+        } else {
+            Err(())
+        }
+    }
+
+    fn is_end_node(&self) -> bool {
+        return self.current.name.chars().nth(2).unwrap() == 'Z';
+    }
+
+    fn find_loop(&self, mut directions: Directions) -> Option<Loop> {
+        let mut copy = (*self).clone();
+        let limit = 100_000; // due to directions, loops can be longer than our amount of nodes
+
+        // We found a loop when we arrived at the same node again with the same offset in the
+        // pathing loop
+        let mut visited = HashMap::<(&String, usize), usize>::new();
+        let mut steps = 0;
+        let mut end_node_offset : Option<usize> = None;
+
+        // We will loop until we find the first visited node
+        while let Some(dir) = directions.next() {
+            if copy.is_end_node() {
+                if end_node_offset.is_some() {
+                    // turns out this doesn't happen, making the whole thing a lot easier
+                    panic!("Found loop with multiple end nodes!");
+                }
+                else {
+                    end_node_offset = Some(steps);
+                }
+            }
+
+            let key = (&copy.current.name, directions.get_offset());
+            if visited.contains_key(&key) {
+                let offset = visited.get(&key).unwrap();
+                // We found the loop!
+                // The loop offset is the number of steps to the current node and the loop length is
+                // the difference from our counter to the offset. However, what we actually want is
+                // the offset to the first end node, since that's technically our first loop end.
+                if end_node_offset.is_none() {
+                    // Luckily it turns out this doesn't happen, either
+                    panic!("Found loop without end node!");
+                }
+
+                return Some(Loop {
+                    offset: end_node_offset.unwrap(),
+                    length: steps - *offset,
+                });
+            }
+            else if steps > limit {
+                // we found no loop, give up
+                break;
+            }
+            else {
+                visited.insert(key, steps);
+            }
+
+
+            Self::advance(&mut copy, dir).expect("Failed to advance!");
+            steps += 1;
+        }
+
+        panic!("Found no loop, giving up!");
     }
 }
 
@@ -77,7 +172,15 @@ impl Node {
             right: String::from(&value[12..15]),
         })
     }
+
+    fn lookup<'a>(&'a self, direction: Direction, lookup: &'a HashMap<String, Node>) -> Option<&Node> {
+        lookup.get(&*match direction {
+            Direction::Left => &self.left,
+            Direction::Right => &self.right,
+        })
+    }
 }
+
 
 fn parse_input(input : &String) -> Option<Input> {
     let mut lines = input.lines();
@@ -107,12 +210,9 @@ fn follow_directions(mut input: Input) -> Option<u64> {
     let mut current_node = input.nodes.get("AAA").expect("Start node not found!");
     let mut counter = 0;
     while counter < limit {
-        current_node = input.nodes.get(
-            &*match input.directions.next()? {
-                Direction::Left => &current_node.left,
-                Direction::Right => &current_node.right,
-            }
-        ).expect(&*format!("We have reached an unknown node: {:?}!", current_node));
+        current_node = current_node
+            .lookup(input.directions.next()?, &input.nodes)
+            .expect(&*format!("We have reached an unknown node: {:?}!", current_node));
         counter += 1;
 
         if current_node.name == "ZZZ" {
@@ -121,6 +221,46 @@ fn follow_directions(mut input: Input) -> Option<u64> {
     }
 
     panic!("Iteration limit reached!");
+}
+
+fn follow_ghost_directions(input: Input) -> Option<usize> {
+    let loops = input.nodes.iter()
+        .filter(|(_, node)| node.name.chars().nth(2).unwrap() == 'A')
+        .map(|(_, node)| Path::new(node, &input.nodes))
+        .map(|path| path.find_loop(input.directions.clone()))
+        .collect::<Option<Vec<Loop>>>()?;
+    //loops.iter().for_each(|lp|  println!("{:?}", lp));
+
+    // Turns out, the following is true, making the problem a lot easier:
+    assert!(loops.iter().all(|l| l.offset == l.length));
+
+    // Now we just need to find the lowest common denominator
+    let lcm = loops.iter()
+        .map(|l| l.length)
+        .reduce(lowest_common_multiple)?;
+
+    Some(lcm)
+}
+
+fn lowest_common_multiple<T>(a : T, b : T) -> T
+    where T : Eq,
+          T : Ord,
+          T : Sub<Output = T>,
+          T : Mul<Output = T>,
+          T : Div<Output = T>,
+          T : Copy {
+    (a * b) / greatest_common_divisor(a, b)
+}
+
+fn greatest_common_divisor<T>(mut a : T, mut b : T) -> T
+    where T : Eq, T : Ord, T : Sub<Output=T>, T : Copy {
+    while a != b {
+        if b > a {
+            (b, a) = (a, b);
+        }
+        a = a - b;
+    }
+    a
 }
 
 fn day8_1() {
@@ -134,4 +274,9 @@ fn day8_1() {
 
 fn day8_2() {
     let input = get_input_or_panic("8-1");
+    let data = parse_input(&input).unwrap();
+    let steps = follow_ghost_directions(data).unwrap();
+
+    assert_eq!(steps, 16342438708751);
+    println!("Number of steps: {steps}")
 }

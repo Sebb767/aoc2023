@@ -7,6 +7,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod reduce;
 
 use std::env;
 use std::time::Instant;
