@@ -2,7 +2,7 @@ use crate::tools::get_input_or_panic;
 
 #[allow(dead_code)]
 pub fn day1() {
-    assert_eq!(parse_line_advanced("2zf2"), Some(22 as i32));
+    assert_eq!(parse_line_advanced("2zf2"), Some(22i32));
     day1_1(); // Sum: 53334
     day1_2(); // Sum: 52834
 }
@@ -46,35 +46,32 @@ where
 // But no digit as word will be valid with the first character cut, so we can always lazily advance
 // by one.
 fn string_to_next_digit(input: &str) -> Option<i32> {
-    assert!(input.len() > 0);
+    assert!(!input.is_empty());
 
     let digit_words = [
         "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
     ];
     let digits = "0123456789";
 
-    match digits.find(input.chars().nth(0).unwrap()) {
-        Some(idx) => return Some(idx as i32),
-        None => (),
-    };
+    if let Some(idx) = digits.find(input.chars().next().unwrap()) { return Some(idx as i32) };
 
     for (idx, digit_word) in digit_words.iter().enumerate() {
         if input.starts_with(digit_word) {
             return Option::Some(idx as i32);
         }
     }
-    return Option::None;
+    None
 }
 
 fn parse_line_advanced(line: &str) -> Option<i32> {
-    let mut first: Option<i32> = Option::None;
-    let mut last: Option<i32> = Option::None;
+    let mut first: Option<i32> = None;
+    let mut last: Option<i32> = None;
 
     for offset in 0..line.len() {
         let digit = string_to_next_digit(&line[offset..]);
         if digit.is_some() {
             if first.is_none() {
-                first = digit.clone();
+                first = digit;
                 last = digit;
             } else {
                 last = digit;
@@ -87,8 +84,8 @@ fn parse_line_advanced(line: &str) -> Option<i32> {
 
 fn parse_line(line: &str) -> Option<i32> {
     let digits = "0123456789";
-    let mut first: Option<i32> = Option::None;
-    let mut last: Option<i32> = Option::None;
+    let mut first: Option<i32> = None;
+    let mut last: Option<i32> = None;
 
     for char in line.chars() {
         let digit_result = digits.find(char);
@@ -111,5 +108,5 @@ fn combine_digits(first: Option<i32>, last: Option<i32>) -> Option<i32> {
         Some(ldigit) => (fdigit * 10) + ldigit,
         None => fdigit * 11,
     };
-    Option::Some(result)
+    Some(result)
 }

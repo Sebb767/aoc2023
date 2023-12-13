@@ -3,7 +3,7 @@ use std::env;
 use std::fs;
 use std::path::Path;
 
-fn main() -> () {
+fn main() {
     let out_dir = env::var("OUT_DIR").unwrap();
     let output_path = Path::new(&out_dir).join("inputs");
     if !output_path.is_dir() {
