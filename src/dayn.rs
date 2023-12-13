@@ -1,6 +1,5 @@
 use crate::tools::get_input_or_panic;
 
-#[allow(dead_code)]
 pub fn dayn() {
     dayn_1();
     dayn_2();
