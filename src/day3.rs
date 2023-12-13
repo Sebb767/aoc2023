@@ -1,3 +1,4 @@
+#![allow(clippy::all)]
 use crate::tools::get_input_or_panic;
 use std::iter::{Enumerate, Peekable};
 use std::str::Chars;

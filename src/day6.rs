@@ -1,3 +1,4 @@
+#![allow(clippy::all)]
 use crate::tools::{get_input_or_panic, string_with_spaces_and_numbers_to_vec_of_numbers};
 
 #[derive(Debug)]

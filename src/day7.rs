@@ -1,3 +1,4 @@
+#![allow(clippy::all)]
 use crate::return_none_unless;
 use crate::tools::get_input_or_panic;
 use std::cmp::Ordering;
