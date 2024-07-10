@@ -1,4 +1,5 @@
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -11,6 +12,7 @@ mod reduce;
 mod tools;
 
 use crate::day1::day1;
+use crate::day10::day10;
 use crate::day2::day2;
 use crate::day3::day3;
 use crate::day4::day4;
@@ -38,7 +40,7 @@ where
 }
 
 fn main() {
-    let days = [day1, day2, day3, day4, day5, day6, day7, day8, day9];
+    let days = [day1, day2, day3, day4, day5, day6, day7, day8, day9, day10];
     let args: Vec<String> = env::args().collect();
 
     if !args.is_empty() && args.contains(&String::from("--all")) {
