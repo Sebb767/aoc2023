@@ -64,9 +64,7 @@ fn parse_line(line: &str) -> Game {
 }
 
 fn is_valid_draw(input: &Draw, reference: &Draw) -> bool {
-    input.blue <= reference.blue
-        && input.red <= reference.red
-        && input.green <= reference.green
+    input.blue <= reference.blue && input.red <= reference.red && input.green <= reference.green
 }
 
 fn is_valid_game(input: &Game, reference: &Draw) -> bool {

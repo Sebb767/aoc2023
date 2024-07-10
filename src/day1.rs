@@ -53,7 +53,9 @@ fn string_to_next_digit(input: &str) -> Option<i32> {
     ];
     let digits = "0123456789";
 
-    if let Some(idx) = digits.find(input.chars().next().unwrap()) { return Some(idx as i32) };
+    if let Some(idx) = digits.find(input.chars().next().unwrap()) {
+        return Some(idx as i32);
+    };
 
     for (idx, digit_word) in digit_words.iter().enumerate() {
         if input.starts_with(digit_word) {
