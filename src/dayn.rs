@@ -6,9 +6,9 @@ pub fn dayn() {
 }
 
 fn dayn_1() {
-    let input = get_input_or_panic("n-1");
+    let input = get_input_or_panic("n-1", 2024);
 }
 
 fn dayn_2() {
-    let input = get_input_or_panic("n-1");
+    let input = get_input_or_panic("n-1", 2024);
 }
