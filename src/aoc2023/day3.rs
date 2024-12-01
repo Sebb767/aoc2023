@@ -137,7 +137,7 @@ pub fn day3() {
 }
 
 pub fn day3_1() {
-    let input = get_input_or_panic("3-1");
+    let input = get_input_or_panic("3-1", 2023);
     let field = parse_field(input);
     let n_numbers = field.numbers.len();
     let n_symbols = field.symbols.len();
@@ -162,7 +162,7 @@ pub fn day3_1() {
 }
 
 pub fn day3_2() {
-    let input = get_input_or_panic("3-1");
+    let input = get_input_or_panic("3-1", 2023);
     let field = parse_field(input);
 
     let gear_ratios: u32 = field

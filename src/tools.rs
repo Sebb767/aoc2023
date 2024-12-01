@@ -1,8 +1,8 @@
 use std::fs;
 use std::str::FromStr;
 
-pub fn get_input(day: &str) -> Result<String, String> {
-    let fname = format!("./inputs/day{}.txt", day);
+pub fn get_input(day: &str, year: u16) -> Result<String, String> {
+    let fname = format!("./inputs/{}/day{}.txt", year, day);
     let result = fs::read_to_string(fname.clone());
     if let Ok(result) = result {
         Ok(result)
@@ -11,8 +11,8 @@ pub fn get_input(day: &str) -> Result<String, String> {
     }
 }
 
-pub fn get_input_or_panic(day: &str) -> String {
-    let result = get_input(day);
+pub fn get_input_or_panic(day: &str, year: u16) -> String {
+    let result = get_input(day, year);
     if result.is_err() {
         panic!("{}", result.unwrap_err());
     };

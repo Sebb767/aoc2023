@@ -101,7 +101,7 @@ pub fn day6() {
 }
 
 fn day6_1() {
-    let input = get_input_or_panic("6-1");
+    let input = get_input_or_panic("6-1", 2023);
     let races = parse_races(input);
     let n_races = races.len();
     let n_winning_strategies: Vec<i64> = races.into_iter().map(find_n_valid_strategies).collect();
@@ -112,7 +112,7 @@ fn day6_1() {
 }
 
 fn day6_2() {
-    let input = get_input_or_panic("6-1");
+    let input = get_input_or_panic("6-1", 2023);
     let race = parse_race(input);
     let result = find_n_valid_strategies_fast(race);
 

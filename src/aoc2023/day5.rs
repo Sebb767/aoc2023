@@ -264,7 +264,7 @@ pub fn day5() {
 }
 
 fn day5_1() {
-    let input = get_input_or_panic("5-1");
+    let input = get_input_or_panic("5-1", 2023);
     let data = parse_day5_input(input).unwrap();
 
     let (category, seeds) = run_mappers(data);
@@ -279,7 +279,7 @@ fn day5_1() {
 }
 
 fn day5_2() {
-    let input = get_input_or_panic("5-1");
+    let input = get_input_or_panic("5-1", 2023);
     let DayFiveInput { seeds, mapper } = parse_day5_input(input).unwrap();
 
     let transformed_seeds = seed_range_input_to_seeds(seeds);

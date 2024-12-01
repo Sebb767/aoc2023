@@ -8,7 +8,7 @@ pub fn day1() {
 }
 
 pub fn day1_1() {
-    let input = get_input_or_panic("1-1");
+    let input = get_input_or_panic("1-1", 2023);
     let sum = summer(input, parse_line);
 
     println!("Final sum (part 1): {}", sum);
@@ -16,7 +16,7 @@ pub fn day1_1() {
 }
 
 pub fn day1_2() {
-    let input = get_input_or_panic("1-1");
+    let input = get_input_or_panic("1-1", 2023);
     let sum = summer(input, parse_line_advanced);
 
     println!("Final sum (part 2): {}", sum);

@@ -301,7 +301,7 @@ pub fn day7() {
 }
 
 fn day7_1() {
-    let input = get_input_or_panic("7-1");
+    let input = get_input_or_panic("7-1", 2023);
     let mut parsed = parse_input_to_analyzed_hand::<SimpleAnalyzer>(input).unwrap();
     let score = score_hands(&mut parsed);
     let result: Bid = score.iter().sum();
@@ -311,7 +311,7 @@ fn day7_1() {
 }
 
 fn day7_2() {
-    let input = get_input_or_panic("7-1");
+    let input = get_input_or_panic("7-1", 2023);
 
     let mut parsed = parse_input_to_analyzed_hand::<JokerAwareAnalyzer>(input).unwrap();
     let score = score_hands(&mut parsed);

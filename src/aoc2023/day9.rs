@@ -62,7 +62,7 @@ pub fn day9() {
 }
 
 fn day9_1() {
-    let input = get_input_or_panic("9-1");
+    let input = get_input_or_panic("9-1", 2023);
     let sensor_values = input
         .lines()
         .map(string_with_spaces_and_numbers_to_vec_of_numbers)
@@ -78,7 +78,7 @@ fn day9_1() {
 }
 
 fn day9_2() {
-    let input = get_input_or_panic("9-1");
+    let input = get_input_or_panic("9-1", 2023);
     let sensor_values = input
         .lines()
         .map(string_with_spaces_and_numbers_to_vec_of_numbers)

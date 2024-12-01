@@ -280,7 +280,7 @@ where
 }
 
 fn day8_1() {
-    let input = get_input_or_panic("8-1");
+    let input = get_input_or_panic("8-1", 2023);
     let data = parse_input(&input).unwrap();
     let steps = follow_directions(data).unwrap();
 
@@ -289,7 +289,7 @@ fn day8_1() {
 }
 
 fn day8_2() {
-    let input = get_input_or_panic("8-1");
+    let input = get_input_or_panic("8-1", 2023);
     let data = parse_input(&input).unwrap();
     let steps = follow_ghost_directions(data).unwrap();
 

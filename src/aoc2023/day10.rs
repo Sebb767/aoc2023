@@ -191,7 +191,7 @@ pub fn day10() {
 }
 
 fn day10_1() {
-    let input = get_input_or_panic("10-1");
+    let input = get_input_or_panic("10-1", 2023);
     let grid = Grid::new(input);
     let distance = find_distance_to_farthest_point(&grid);
 
@@ -200,5 +200,5 @@ fn day10_1() {
 }
 
 fn day10_2() {
-    let _input = get_input_or_panic("10-1");
+    let _input = get_input_or_panic("10-1", 2023);
 }

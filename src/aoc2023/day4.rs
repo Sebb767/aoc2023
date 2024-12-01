@@ -96,7 +96,7 @@ pub fn day4() {
 }
 
 fn day4_1() {
-    let input = get_input_or_panic("4-1");
+    let input = get_input_or_panic("4-1", 2023);
     let lines: Vec<&str> = input.lines().collect();
     let cards: Vec<Card> = lines.into_iter().map(parse_card).collect();
     let card_values: Vec<u32> = cards.iter().map(card_value).collect();
@@ -107,7 +107,7 @@ fn day4_1() {
 }
 
 fn day4_2() {
-    let input = get_input_or_panic("4-1");
+    let input = get_input_or_panic("4-1", 2023);
     let lines: Vec<&str> = input.lines().collect();
     let cards: Vec<Card> = lines.into_iter().map(parse_card).collect();
     let sum = find_amount_of_cards(&cards);

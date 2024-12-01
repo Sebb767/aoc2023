@@ -108,7 +108,7 @@ fn day2_1() {
         blue: 14,
     };
 
-    let input = get_input_or_panic("2-1");
+    let input = get_input_or_panic("2-1", 2023);
     let lines: Vec<&str> = input.lines().collect();
     let games: Vec<Game> = lines.into_iter().map(parse_line).collect();
     let valid_games: Vec<Game> = games
@@ -122,7 +122,7 @@ fn day2_1() {
 }
 
 fn day2_2() {
-    let input = get_input_or_panic("2-1");
+    let input = get_input_or_panic("2-1", 2023);
     let lines: Vec<&str> = input.lines().collect();
     let games: Vec<Game> = lines.into_iter().map(parse_line).collect();
     let powers: Vec<i32> = games.into_iter().map(game_power).collect();
