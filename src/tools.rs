@@ -23,11 +23,19 @@ pub fn string_with_spaces_and_numbers_to_vec_of_numbers<T: FromStr>(
     input: &str,
 ) -> Result<Vec<T>, T::Err> {
     let parsed: Result<Vec<T>, T::Err> = input
-        .split(' ')
-        .filter(|s| !s.is_empty())
+        .split_whitespace()
         .map(|s| s.parse())
         .collect();
     parsed
+}
+
+pub fn input_with_lines_with_spaces_and_numbers_to_vec_of_vec_of_numbers<T: FromStr>(
+    input: &str
+) -> Result<Vec<Vec<T>>, T::Err> {
+    input
+        .lines()
+        .map(|l| string_with_spaces_and_numbers_to_vec_of_numbers(l))
+        .collect()
 }
 
 #[macro_export]
