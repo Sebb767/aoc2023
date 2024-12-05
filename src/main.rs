@@ -2,6 +2,7 @@ mod reduce;
 mod tools;
 mod aoc2023;
 mod aoc2024;
+mod day;
 
 use std::collections::HashMap;
 use std::env;

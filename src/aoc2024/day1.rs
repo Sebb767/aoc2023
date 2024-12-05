@@ -1,14 +1,40 @@
 use std::collections::HashMap;
 use std::hash::Hash;
-use crate::tools::get_input_or_panic;
+use crate::day::{Day, DayResult, ExpectedResults, YearDay};
+use crate::ExpectedResult;
 
-pub fn day1() {
-    day1_1();
-    day1_2();
+pub(crate) struct Day1;
+
+impl Day for Day1 {
+    fn part1(&self, input: String) -> Option<DayResult> {
+        Some(day1_1(input))
+    }
+
+    fn part2(&self, input: String) -> Option<DayResult> {
+        Some(day1_2(input))
+    }
+
+    fn get_expected_results(&self) -> ExpectedResults {
+        ExpectedResult!(0, 2375403, 0, 23082277)
+    }
+
+    fn get_year_and_date(&self) -> YearDay {
+        YearDay {
+            year: 2024,
+            day: 1,
+        }
+    }
+
+    fn part1_result_description(&self) -> String {
+        String::from("Sum of differences of numbers")
+    }
+
+    fn part2_result_description(&self) -> String {
+        String::from("Difference score")
+    }
 }
 
-fn read_input() -> (Vec<u64>, Vec<u64>) {
-    let input = get_input_or_panic("1-1", 2024);
+fn read_input(input: String) -> (Vec<u64>, Vec<u64>) {
     let lines: Vec<&str> = input.lines().collect();
     let count = lines.len();
 
@@ -30,8 +56,8 @@ fn read_input() -> (Vec<u64>, Vec<u64>) {
     return (left, right);
 }
 
-fn day1_1() {
-    let (left, right) = read_input();
+fn day1_1(input: String) -> DayResult {
+    let (left, right) = read_input(input);
 
     let mut ileft = left.into_iter();
     let mut iright = right.into_iter();
@@ -41,17 +67,19 @@ fn day1_1() {
         result += u64::abs_diff(nright, nleft);
     }
 
-    println!("Sum of differences of numbers: {result}");
+    result as DayResult
 }
 
-fn list_to_occurrence_map<T>(inp : &Vec<T>) -> HashMap<T, u64> where T : Hash + Eq + Copy {
+fn list_to_occurrence_map<T>(inp: &Vec<T>) -> HashMap<T, u64>
+where
+    T: Hash + Eq + Copy,
+{
     let mut map: HashMap<T, u64> = HashMap::new();
 
     for num in inp.into_iter() {
         if let Some(kref) = map.get_mut(&num) {
             *kref += 1;
-        }
-        else {
+        } else {
             map.insert(*num, 1);
         }
     }
@@ -59,8 +87,8 @@ fn list_to_occurrence_map<T>(inp : &Vec<T>) -> HashMap<T, u64> where T : Hash + 
     map
 }
 
-fn day1_2() {
-    let (left, right) = read_input();
+fn day1_2(input: String) -> DayResult {
+    let (left, right) = read_input(input);
     let lmap = list_to_occurrence_map(&left);
     let rmap = list_to_occurrence_map(&right);
 
@@ -72,5 +100,5 @@ fn day1_2() {
         }
     }
 
-    println!("Difference score: {result}");
+    result as DayResult
 }
