@@ -72,6 +72,12 @@ impl ExpectedResults {
     }
 }
 
+impl YearDay {
+    pub fn y2024(day: u16) -> Self {
+        YearDay { year: 2024, day }
+    }
+}
+
 impl Display for RunType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
@@ -178,16 +184,14 @@ pub trait Day {
 
         println!();
         println!("# day {day} {run_type} completed in {elapsed:.3}s");
-        println!();
         result
     }
 
     fn run(&self) -> RunResultType {
-        let result = min(
-            self.run_type(&RunType::Test),
-            self.run_type(&RunType::Actual),
-        );
+        let test = self.run_type(&RunType::Test);
         println!();
-        result
+        let actual = self.run_type(&RunType::Actual);
+
+        min(test, actual)
     }
 }
