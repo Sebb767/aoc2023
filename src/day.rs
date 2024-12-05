@@ -7,6 +7,7 @@ pub type BoxedDay = Box<dyn Day>;
 
 pub type DayResult = i128;
 
+#[derive(Copy, Clone)]
 pub struct YearDay {
     pub year: u16,
     pub day: u16,
