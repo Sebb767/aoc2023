@@ -38,6 +38,7 @@ pub fn input_with_lines_with_spaces_and_numbers_to_vec_of_vec_of_numbers<T: From
         .collect()
 }
 
+
 #[macro_export]
 macro_rules! return_none_unless {
     ($val:expr $(,)?) => {
@@ -46,4 +47,32 @@ macro_rules! return_none_unless {
             false => return None,
         }
     };
+}
+
+pub struct Matrix<T> {
+    data: Vec<Vec<T>>,
+    xsize: usize,
+    ysize: usize,
+}
+
+impl<T> Matrix<T> {
+    pub fn create(data: Vec<Vec<T>>) -> Self {
+        let ysize = data.len();
+        assert_ne!(ysize, 0);
+        let xsize = data.get(0).unwrap().len();
+        data.iter().for_each(|v| assert_eq!(xsize, v.len()));
+        Matrix { data, xsize, ysize }
+    }
+
+    pub fn get(&self, x : usize, y : usize) -> Option<&T> {
+        return self.data.get(y)?.get(x);
+    }
+
+    pub fn get_data(&self) -> &Vec<Vec<T>> {
+        &self.data
+    }
+
+    pub fn get_dimensions(&self) -> (usize, usize) {
+        (self.xsize, self.ysize)
+    }
 }
