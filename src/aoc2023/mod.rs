@@ -8,7 +8,7 @@ use crate::aoc2023::day6::day6;
 use crate::aoc2023::day7::day7;
 use crate::aoc2023::day8::day8;
 use crate::aoc2023::day9::day9;
-use crate::aoc2023::day10::day10;
+use crate::aoc2023::day10::Day10;
 use crate::aoc2023::fallback::Fallback;
 use crate::day::BoxedDay;
 
@@ -26,13 +26,15 @@ mod fallback;
 
 pub fn get_days() -> Vec<fn()>
 {
-    let days = vec!(day1, day2, day3, day4, day5, day6, day7, day8, day9, day10);
+    let days = vec!(day1, day2, day3, day4, day5, day6, day7, day8, day9);
     return days;
 }
 
 pub fn get_days_adv() -> Vec<BoxedDay> {
-    get_days().iter().enumerate().map(|dt| {
+    let mut basic: Vec<BoxedDay> = get_days().iter().enumerate().map(|dt| {
         let (idx, closure) = dt;
         Fallback::create_boxed((idx + 1) as u16, *closure)
-    }).collect()
+    }).collect();
+    basic.push(Box::new(Day10));
+    basic
 }

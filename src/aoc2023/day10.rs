@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use crate::day::{Day, DayResult, ExpectedResults, YearDay};
+use crate::ExpectedResult;
 use crate::tools::get_input_or_panic;
 
 type Coordinate = usize;
@@ -185,20 +187,32 @@ fn find_distance_to_farthest_point(grid : &Grid) -> usize {
     unreachable!();
 }
 
-pub fn day10() {
-    day10_1();
-    day10_2();
-}
+pub(crate) struct Day10;
+impl Day for Day10 {
+    fn part1(&self, input: String) -> Option<DayResult> {
+        let grid = Grid::new(input);
+        let distance = find_distance_to_farthest_point(&grid) - 1;
 
-fn day10_1() {
-    let input = get_input_or_panic("10-1", 2023);
-    let grid = Grid::new(input);
-    let distance = find_distance_to_farthest_point(&grid);
+        Some(distance as DayResult)
+    }
 
+    fn part2(&self, input: String) -> Option<DayResult> {
+        None
+    }
 
-    println!("Distance to farthest point: {}", distance);
-}
+    fn get_expected_results(&self) -> ExpectedResults {
+        ExpectedResult!(8, 6733, 10)
+    }
 
-fn day10_2() {
-    let _input = get_input_or_panic("10-1", 2023);
+    fn get_year_and_date(&self) -> YearDay {
+        YearDay { year: 2023, day: 10 }
+    }
+
+    fn part1_result_description(&self) -> String {
+        String::from("Distance to farthest point")
+    }
+
+    /*fn part2_result_description(&self) -> String {
+        todo!()
+    }*/
 }
