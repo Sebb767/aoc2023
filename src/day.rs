@@ -100,6 +100,14 @@ pub trait Day {
     fn get_expected_results(&self) -> ExpectedResults;
     fn get_year_and_date(&self) -> YearDay;
 
+    fn part1_result_description(&self) -> String {
+        String::from("Result for part 1")
+    }
+
+    fn part2_result_description(&self) -> String {
+        String::from("Result for part 2")
+    }
+
     fn get_input(&self, run_type: &RunType, part: &Part) -> Option<String> {
         let YearDay { year, day } = self.get_year_and_date();
         let prefix = format!("./inputs/{}/", year);
@@ -124,14 +132,6 @@ pub trait Day {
         }
 
         None
-    }
-
-    fn part1_result_description(&self) -> String {
-        String::from("Result for part 1")
-    }
-
-    fn part2_result_description(&self) -> String {
-        String::from("Result for part 2")
     }
 
     fn run_part(&self, run_type: &RunType, part: &Part) -> RunResultType {
