@@ -133,7 +133,7 @@ impl Day for Day10 {
         Some(distance as DayResult)
     }
 
-    fn part2(&self, input: String) -> Option<DayResult> {
+    fn part2(&self, _input: String) -> Option<DayResult> {
         None
     }
 

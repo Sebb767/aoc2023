@@ -53,7 +53,7 @@ macro_rules! return_none_unless {
 pub type Coordinate = usize;
 pub type CoordinateDelta = isize;
 
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct Position {
     pub x: Coordinate,
     pub y: Coordinate,
@@ -76,13 +76,13 @@ pub struct PositionDelta {
 #[derive(Debug, Hash, Copy, Clone)]
 #[rustfmt::skip] // :>
 pub enum Direction {
-    North,
+         North,
     West,      East,
-    South,
+         South,
 }
 
 impl Direction {
-    pub const ALL : [Direction; 4] = [Direction::North, Direction::East, Direction::West, Direction::South];
+    pub const ALL: [Direction; 4] = [Direction::North, Direction::East, Direction::West, Direction::South];
 
     pub fn reverse(&self) -> Direction {
         match self {
@@ -104,10 +104,10 @@ impl Direction {
 
     pub fn get_others(&self) -> &[Direction; 3] {
         match self {
-            Direction::North => &[ Direction::West, Direction::East, Direction::South ],
-            Direction::West => &[ Direction::North, Direction::East, Direction::South ],
-            Direction::East => &[ Direction::West, Direction::North, Direction::South ],
-            Direction::South => &[ Direction::West, Direction::East, Direction::North ],
+            Direction::North => &[Direction::West, Direction::East, Direction::South],
+            Direction::West => &[Direction::North, Direction::East, Direction::South],
+            Direction::East => &[Direction::West, Direction::North, Direction::South],
+            Direction::South => &[Direction::West, Direction::East, Direction::North],
         }
     }
 }
@@ -127,15 +127,64 @@ impl<T> Matrix<T> {
         Matrix { data, xsize, ysize }
     }
 
-    pub fn get(&self, x : usize, y : usize) -> Option<&T> {
+    pub fn get(&self, x: usize, y: usize) -> Option<&T> {
         return self.data.get(y)?.get(x);
     }
 
-    pub fn get_data(&self) -> &Vec<Vec<T>> {
-        &self.data
+    pub fn get_position(&self, position: &Position) -> Option<&T> {
+        return self.get(position.x, position.y);
     }
 
     pub fn get_dimensions(&self) -> (usize, usize) {
         (self.xsize, self.ysize)
+    }
+
+    pub fn checked_position_apply(&self, position: &Position, delta: &PositionDelta) -> Option<Position> {
+        let next = position.apply(delta)?;
+        return if next.x >= self.xsize || next.y >= self.ysize {
+            None
+        } else {
+            Some(next)
+        };
+    }
+
+    pub fn from_string<F>(input: &String, mapper: F) -> Self
+    where
+        F: Fn(char) -> T,
+    {
+        let lines: Vec<&str> = input.lines().collect();
+        let mut data: Vec<Vec<T>> = Vec::with_capacity(lines.capacity());
+
+        for line in lines {
+            data.push(
+                line
+                    .chars()
+                    .map(&mapper)
+                    .collect()
+            );
+        }
+
+        Matrix::create(data)
+    }
+}
+
+impl<T> Matrix<T>
+where
+    T: Eq,
+{
+    pub fn find_first(&self, needle: &T) -> Option<Position> {
+        for (y, row) in self.data.iter().enumerate() {
+            if let Some(x) = row.iter().position(|elem| elem == needle) {
+                return Some(Position { x, y });
+            }
+        }
+
+        None
+    }
+}
+
+impl Matrix<char> {
+    pub fn char_matrix_from_string(input: &String) -> Self {
+        Self::from_string(input, |c| c)
     }
 }

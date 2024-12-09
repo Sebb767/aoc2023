@@ -54,14 +54,12 @@ impl ExpectedResults {
         part1_real: Option<DayResult>,
         part2_test: Option<DayResult>,
         part2_real: Option<DayResult>) -> ExpectedResults {
-        let part1_test = vec!(part1_test);
-        let part2_test = part2_test.map(|r| vec!(r));
-        ExpectedResults {
-            part1_test,
+        Self::create_expected_results_multiple_tests(
+            vec!(part1_test),
             part1_real,
-            part2_test,
-            part2_real,
-        }
+            part2_test.map(|r| vec!(r)),
+            part2_real
+        ) 
     }
 
     pub fn create_expected_results_multiple_tests(
