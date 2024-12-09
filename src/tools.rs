@@ -49,6 +49,69 @@ macro_rules! return_none_unless {
     };
 }
 
+
+pub type Coordinate = usize;
+pub type CoordinateDelta = isize;
+
+#[derive(Debug, Hash, PartialEq, Eq)]
+pub struct Position {
+    pub x: Coordinate,
+    pub y: Coordinate,
+}
+
+impl Position {
+    pub fn apply(&self, delta: &PositionDelta) -> Option<Position> {
+        let x = self.x.checked_add_signed(delta.x)?;
+        let y = self.y.checked_add_signed(delta.y)?;
+        Some(Position { x, y })
+    }
+}
+
+#[derive(Debug)]
+pub struct PositionDelta {
+    x: CoordinateDelta,
+    y: CoordinateDelta,
+}
+
+#[derive(Debug, Hash, Copy, Clone)]
+#[rustfmt::skip] // :>
+pub enum Direction {
+    North,
+    West,      East,
+    South,
+}
+
+impl Direction {
+    pub const ALL : [Direction; 4] = [Direction::North, Direction::East, Direction::West, Direction::South];
+
+    pub fn reverse(&self) -> Direction {
+        match self {
+            Direction::North => Direction::South,
+            Direction::West => Direction::East,
+            Direction::East => Direction::West,
+            Direction::South => Direction::North,
+        }
+    }
+
+    pub fn to_position_delta(&self) -> PositionDelta {
+        match self {
+            Direction::North => PositionDelta { x: 0, y: -1 },
+            Direction::West => PositionDelta { x: -1, y: 0 },
+            Direction::East => PositionDelta { x: 1, y: 0 },
+            Direction::South => PositionDelta { x: 0, y: 1 },
+        }
+    }
+
+    pub fn get_others(&self) -> &[Direction; 3] {
+        match self {
+            Direction::North => &[ Direction::West, Direction::East, Direction::South ],
+            Direction::West => &[ Direction::North, Direction::East, Direction::South ],
+            Direction::East => &[ Direction::West, Direction::North, Direction::South ],
+            Direction::South => &[ Direction::West, Direction::East, Direction::North ],
+        }
+    }
+}
+
 pub struct Matrix<T> {
     data: Vec<Vec<T>>,
     xsize: usize,
