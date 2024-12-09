@@ -14,10 +14,10 @@ pub struct YearDay {
 }
 
 pub struct ExpectedResults {
-    pub part1_test: DayResult,
-    pub part1_real: Option<DayResult>,
-    pub part2_test: Option<DayResult>,
-    pub part2_real: Option<DayResult>,
+    part1_test: Vec<DayResult>,
+    part1_real: Option<DayResult>,
+    part2_test: Option<Vec<DayResult>>,
+    part2_real: Option<DayResult>,
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
@@ -54,6 +54,8 @@ impl ExpectedResults {
         part1_real: Option<DayResult>,
         part2_test: Option<DayResult>,
         part2_real: Option<DayResult>) -> ExpectedResults {
+        let part1_test = vec!(part1_test);
+        let part2_test = part2_test.map(|r| vec!(r));
         ExpectedResults {
             part1_test,
             part1_real,
@@ -62,12 +64,30 @@ impl ExpectedResults {
         }
     }
 
-    pub fn get_expected_result_for_type(&self, run_type: &RunType, part: &Part) -> Option<DayResult> {
-        match (run_type, part) {
-            (RunType::Test, Part::Part1) => Some(self.part1_test),
-            (RunType::Actual, Part::Part1) => self.part1_real,
-            (RunType::Test, Part::Part2) => self.part2_test,
-            (RunType::Actual, Part::Part2) => self.part2_real,
+    pub fn create_expected_results_multiple_tests(
+        part1_test: Vec<DayResult>,
+        part1_real: Option<DayResult>,
+        part2_test: Option<Vec<DayResult>>,
+        part2_real: Option<DayResult>) -> ExpectedResults {
+        ExpectedResults {
+            part1_test,
+            part1_real,
+            part2_test,
+            part2_real,
+        }
+    }
+
+    pub fn get_expected_real_result(&self, part: &Part) -> Option<DayResult> {
+        match part {
+            Part::Part1 => self.part1_real,
+            Part::Part2 => self.part2_real,
+        }
+    }
+
+    pub fn get_expected_test_results(&self, part: &Part) -> Option<&Vec<DayResult>> {
+        match part {
+            Part::Part1 => Some(&self.part1_test),
+            Part::Part2 => self.part2_test.as_ref(),
         }
     }
 }
@@ -108,10 +128,16 @@ pub trait Day {
         String::from("Result for part 2")
     }
 
+
     fn get_input(&self, run_type: &RunType, part: &Part) -> Option<String> {
+        self.get_input_indexed(run_type, part, 1)
+    }
+
+    fn get_input_indexed(&self, run_type: &RunType, part: &Part, index: usize) -> Option<String> {
         let YearDay { year, day } = self.get_year_and_date();
         let prefix = format!("./inputs/{}/", year);
         let mut suffixes = vec!(
+            format!("day{day}-{part}.{run_type}-{index}.txt"),
             format!("day{day}-{part}.{run_type}.txt"),
             format!("day{day}.{run_type}.txt"),
         );
@@ -134,24 +160,17 @@ pub trait Day {
         None
     }
 
-    fn run_part(&self, run_type: &RunType, part: &Part) -> RunResultType {
+    fn execute(&self, part: &Part, input: String, expected_result: Option<DayResult>) -> RunResultType {
         let result_description = match part {
             Part::Part1 => self.part1_result_description(),
             Part::Part2 => self.part2_result_description(),
         };
 
-        let input = self.get_input(run_type, part);
-        if input.is_none() {
-            println!("Part {part} failed - could not find input!");
-            return RunResultType::Failed;
-        }
-        let input = input.unwrap();
-
         if let Some(result) = match part {
             Part::Part1 => self.part1(input),
             Part::Part2 => self.part2(input),
         } {
-            if let Some(expected) = self.get_expected_results().get_expected_result_for_type(run_type, part) {
+            if let Some(expected) = expected_result {
                 if result == expected {
                     println!("{result_description}: {result} (verified)");
                     RunResultType::Success
@@ -165,8 +184,61 @@ pub trait Day {
                 RunResultType::Unverified
             }
         } else {
-            println!("Failed: Day function did not return a valid result!");
+            println!("Failed: Day function for {part} did not return a valid result!");
             RunResultType::Failed
+        }
+    }
+
+    fn run_tests(&self, part: &Part) -> RunResultType {
+        if let Some(expected) = self.get_expected_results().get_expected_test_results(part) {
+            assert!(!expected.is_empty());
+            if expected.len() == 1 {
+                if let Some(input) = self.get_input(&RunType::Test, part) {
+                    self.execute(part, input, Some(*expected.first().unwrap()))
+                } else {
+                    println!("Part {part} failed - could not find input!");
+                    RunResultType::Failed
+                }
+            } else {
+                let mut results = Vec::with_capacity(expected.len());
+                for (idx, expected) in expected.iter().enumerate() {
+                    let idx = idx + 1;
+                    if let Some(input) = self.get_input_indexed(&RunType::Test, part, idx) {
+                        results.push(
+                            self.execute(part, input, Some(*expected))
+                        );
+                    }
+                    else {
+                        println!("Part {part} test #{idx} failed - could not find input!");
+                        results.push(RunResultType::Failed);
+                    }
+                }
+
+                *results.iter().min().unwrap()
+            }
+        } else {
+            if let Some(input) = self.get_input(&RunType::Test, part) {
+                self.execute(part, input, None)
+            } else {
+                println!("Part {part} failed - could not find input!");
+                RunResultType::Failed
+            }
+        }
+    }
+
+    fn run_real(&self, part: &Part) -> RunResultType {
+        if let Some(input) = self.get_input(&RunType::Actual, part) {
+            self.execute(part, input, self.get_expected_results().get_expected_real_result(part))
+        } else {
+            println!("Part {part} failed - could not find input!");
+            RunResultType::Failed
+        }
+    }
+
+    fn run_part(&self, run_type: &RunType, part: &Part) -> RunResultType {
+        match run_type {
+            RunType::Test => self.run_tests(part),
+            RunType::Actual => self.run_real(part),
         }
     }
 
