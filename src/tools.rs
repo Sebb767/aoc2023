@@ -103,7 +103,7 @@ impl Display for PositionDelta {
     }
 }
 
-#[derive(Debug, Hash, Copy, Clone)]
+#[derive(Debug, Hash, Copy, Clone, Eq, PartialEq)]
 #[rustfmt::skip] // :>
 pub enum Direction {
     North,
@@ -143,6 +143,8 @@ impl Direction {
     }
 }
 
+
+#[derive(Debug, Hash, PartialEq, Eq, Clone)]
 pub struct Matrix<T> {
     data: Vec<Vec<T>>,
     xsize: usize,
