@@ -52,10 +52,12 @@ impl Day for Day6 {
 
     fn part2(&self, input: String) -> Option<DayResult> {
         let matrix = Matrix::char_matrix_from_string(&input);
+        let visited = walk_matrix(&matrix).unwrap();
         let mut possible_loops = 0;
+        let startposition = matrix.find_first(&'^').unwrap();
 
-        for (pos, char) in matrix.into_iter() {
-            if *char != '#' && *char != '^' {
+        for pos in visited.iter() {
+            if *pos != startposition {
                 let mut mclone = matrix.clone();
                 *mclone.get_position_mut(&pos).unwrap() = '#';
                 if None == walk_matrix(&mclone) {
