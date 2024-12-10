@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::fs;
 use std::str::FromStr;
 
@@ -65,7 +66,21 @@ impl Position {
         let y = self.y.checked_add_signed(delta.y)?;
         Some(Position { x, y })
     }
+
+    pub fn diff(&self, other: &Position) -> PositionDelta {
+        PositionDelta {
+            x: (self.x as CoordinateDelta) - (other.x as CoordinateDelta),
+            y: (self.y as CoordinateDelta) - (other.y as CoordinateDelta),
+        }
+    }
 }
+
+impl Display for Position {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(x={}, y={})", self.x, self.y)
+    }
+}
+
 
 #[derive(Debug)]
 pub struct PositionDelta {
@@ -73,12 +88,28 @@ pub struct PositionDelta {
     y: CoordinateDelta,
 }
 
+impl PositionDelta {
+    pub fn reverse(&self) -> PositionDelta {
+        PositionDelta {
+            x: -self.x,
+            y: -self.y,
+        }
+    }
+}
+
+impl Display for PositionDelta {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Δ(x={}, y={})", self.x, self.y)
+    }
+}
+
 #[derive(Debug, Hash, Copy, Clone)]
 #[rustfmt::skip] // :>
 pub enum Direction {
-         North,
-    West,      East,
-         South,
+    North,
+    West,
+    East,
+    South,
 }
 
 impl Direction {
@@ -128,12 +159,21 @@ impl<T> Matrix<T> {
     }
 
     pub fn get(&self, x: usize, y: usize) -> Option<&T> {
-        return self.data.get(y)?.get(x);
+        self.data.get(y)?.get(x)
+    }
+
+    pub fn get_mut(&mut self, x: usize, y: usize) -> Option<&mut T> {
+        self.data.get_mut(y)?.get_mut(x)
     }
 
     pub fn get_position(&self, position: &Position) -> Option<&T> {
-        return self.get(position.x, position.y);
+        self.get(position.x, position.y)
     }
+
+    pub fn get_position_mut(&mut self, position: &Position) -> Option<&mut T> {
+        self.get_mut(position.x, position.y)
+    }
+
 
     pub fn get_dimensions(&self) -> (usize, usize) {
         (self.xsize, self.ysize)
@@ -141,11 +181,15 @@ impl<T> Matrix<T> {
 
     pub fn checked_position_apply(&self, position: &Position, delta: &PositionDelta) -> Option<Position> {
         let next = position.apply(delta)?;
-        return if next.x >= self.xsize || next.y >= self.ysize {
-            None
-        } else {
+        if self.validate_position(&next) {
             Some(next)
-        };
+        } else {
+            None
+        }
+    }
+
+    pub fn validate_position(&self, position: &Position) -> bool {
+        position.x < self.xsize && position.y < self.ysize
     }
 
     pub fn from_string<F>(input: &String, mapper: F) -> Self
@@ -168,6 +212,20 @@ impl<T> Matrix<T> {
     }
 }
 
+impl<T> Display for Matrix<T> where T : Display {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Matrix {}×{}\n", self.xsize, self.ysize)?;
+        for row in self.data.iter() {
+            for point in row.iter() {
+                write!(f, "{}", point)?;
+            }
+            write!(f, "\n")?;
+        }
+
+        Ok(())
+    }
+}
+
 impl<T> Matrix<T>
 where
     T: Eq,
@@ -186,5 +244,44 @@ where
 impl Matrix<char> {
     pub fn char_matrix_from_string(input: &String) -> Self {
         Self::from_string(input, |c| c)
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Matrix<T> {
+    type Item = (Position, &'a T);
+    type IntoIter = MatrixIterator<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let (xsize, _) = self.get_dimensions();
+        MatrixIterator {
+            matrix: self,
+            xsize,
+            ypos: 0,
+            xpos: 0,
+        }
+    }
+}
+
+pub struct MatrixIterator<'a, T> {
+    matrix: &'a Matrix<T>,
+    xpos: usize,
+    ypos: usize,
+    xsize: usize,
+}
+
+impl<'a, T> Iterator for MatrixIterator<'a, T> {
+    type Item = (Position, &'a T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let item = self.matrix.get(self.xpos, self.ypos)?;
+        let position = Position { x: self.xpos, y: self.ypos };
+
+        self.xpos += 1;
+        if self.xpos >= self.xsize {
+            self.xpos = 0;
+            self.ypos += 1;
+        }
+
+        Some((position, item))
     }
 }

@@ -41,11 +41,21 @@ pub enum RunResultType {
 }
 
 #[macro_export]
+#[allow(non_snake_case)]
 macro_rules! ExpectedResult {
-    ($x: expr) => { ExpectedResults::create_expected_results($x, None, None, None) };
+    ($x: expr) => {ExpectedResults::create_expected_results($x, None, None, None) };
     ($x: expr, $y: expr) => { ExpectedResults::create_expected_results($x, Some($y), None, None) };
     ($x: expr, $y: expr, $z: expr) => { ExpectedResults::create_expected_results($x, Some($y), Some($z), None) };
     ($x: expr, $y: expr, $z: expr, $w: expr) => { ExpectedResults::create_expected_results($x, Some($y), Some($z), Some($w)) };
+}
+
+#[macro_export]
+#[allow(non_snake_case)]
+macro_rules! ExpectedResultMultipleTests {
+    ($x: expr) => {ExpectedResults::create_expected_results_multiple_tests($x, None, None, None) };
+    ($x: expr, $y: expr) => { ExpectedResults::create_expected_results_multiple_tests($x, Some($y), None, None) };
+    ($x: expr, $y: expr, $z: expr) => { ExpectedResults::create_expected_results_multiple_tests($x, Some($y), Some($z), None) };
+    ($x: expr, $y: expr, $z: expr, $w: expr) => { ExpectedResults::create_expected_results_multiple_tests($x, Some($y), Some($z), Some($w)) };
 }
 
 impl ExpectedResults {
@@ -59,7 +69,7 @@ impl ExpectedResults {
             part1_real,
             part2_test.map(|r| vec!(r)),
             part2_real
-        ) 
+        )
     }
 
     pub fn create_expected_results_multiple_tests(
