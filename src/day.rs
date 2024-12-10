@@ -33,7 +33,7 @@ pub enum Part {
     Part2 = 2u16,
 }
 
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum RunResultType {
     Failed = 0,
     Unverified = 1,
@@ -68,7 +68,7 @@ impl ExpectedResults {
             vec!(part1_test),
             part1_real,
             part2_test.map(|r| vec!(r)),
-            part2_real
+            part2_real,
         )
     }
 
@@ -215,8 +215,7 @@ pub trait Day {
                         results.push(
                             self.execute(part, input, Some(*expected))
                         );
-                    }
-                    else {
+                    } else {
                         println!("Part {part} test #{idx} failed - could not find input!");
                         results.push(RunResultType::Failed);
                     }

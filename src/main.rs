@@ -7,17 +7,18 @@ mod day;
 use std::collections::HashMap;
 use std::env;
 use std::time::Instant;
-use crate::day::{BoxedDay, YearDay};
+use crate::day::{BoxedDay, RunResultType, YearDay};
 
-fn call_day(day: &BoxedDay)
+fn call_day(day: &BoxedDay) -> RunResultType
 {
     let YearDay { year: _, day: nday } = day.get_year_and_date();
     let start = Instant::now();
 
-    day.run();
+    let result = day.run();
 
     let elapsed = start.elapsed().as_secs_f64();
     println!("# day {nday} completed in {elapsed:.3}s");
+    result
 }
 
 fn print_year_header(year: u16) {
@@ -35,20 +36,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
 
     if !args.is_empty() && args.contains(&String::from("--all")) {
-        let mut keys: Vec<&u16> = years.keys().collect();
-        keys.sort();
-        let now = Instant::now();
-
-        for key in keys.into_iter() {
-            let days = years.get(key).unwrap();
-            print_year_header(*key);
-            run_days(days);
-        }
-
-        println!(
-            "# All days finished after {:.3}s",
-            now.elapsed().as_secs_f64()
-        )
+        run_list(&years);
     } else {
         let max_year = years.keys().max().unwrap();
         let days = years.get(max_year).unwrap();
@@ -57,8 +45,29 @@ fn main() {
     }
 }
 
-fn run_days(days: &Vec<BoxedDay>) {
+fn run_list(input: &HashMap<u16, Vec<BoxedDay>>) {
+    let mut keys: Vec<&u16> = input.keys().collect();
+    keys.sort();
+    let now = Instant::now();
+    let mut results: Vec<RunResultType> = Vec::new();
+
+    for key in keys.into_iter() {
+        let days = input.get(key).unwrap();
+        print_year_header(*key);
+        let mut day_results = run_days(days);
+        results.append(&mut day_results);
+    }
+
+    print!(
+        "# Whole run finished after {:.3}s ; ",
+        now.elapsed().as_secs_f64()
+    );
+    print_results(&results);
+}
+
+fn run_days(days: &Vec<BoxedDay>) -> Vec<RunResultType> {
     let mut first = true;
+    let mut results = Vec::with_capacity(days.len());
 
     for day in days.iter() {
         if first {
@@ -66,6 +75,26 @@ fn run_days(days: &Vec<BoxedDay>) {
         } else {
             println!();
         }
-        call_day(day);
+        let result = call_day(day);
+        results.push(result);
     }
+
+    results
+}
+
+fn print_results(results: &Vec<RunResultType>) {
+    let frequencies = results
+        .iter()
+        .copied()
+        .fold(HashMap::new(), |mut map, val| {
+            map.entry(val)
+                .and_modify(|frq| *frq += 1)
+                .or_insert(1);
+            map
+        });
+
+    for (result, amount) in frequencies.iter() {
+        print!("{:?}={amount} ", result);
+    }
+    println!();
 }
