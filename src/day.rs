@@ -198,15 +198,15 @@ pub trait Day {
         }
     }
 
-    fn run_tests(&self, part: &Part) -> RunResultType {
+    fn run_tests(&self, part: &Part) -> Vec<RunResultType> {
         if let Some(expected) = self.get_expected_results().get_expected_test_results(part) {
             assert!(!expected.is_empty());
             if expected.len() == 1 {
                 if let Some(input) = self.get_input(&RunType::Test, part) {
-                    self.execute(part, input, Some(*expected.first().unwrap()))
+                    vec!(self.execute(part, input, Some(*expected.first().unwrap())))
                 } else {
                     println!("Part {part} failed - could not find input!");
-                    RunResultType::Failed
+                    vec!(RunResultType::Failed)
                 }
             } else {
                 let mut results = Vec::with_capacity(expected.len());
@@ -222,14 +222,14 @@ pub trait Day {
                     }
                 }
 
-                *results.iter().min().unwrap()
+                results
             }
         } else {
             if let Some(input) = self.get_input(&RunType::Test, part) {
-                self.execute(part, input, None)
+                vec!(self.execute(part, input, None))
             } else {
                 println!("Part {part} failed - could not find input!");
-                RunResultType::Failed
+                vec!(RunResultType::Failed)
             }
         }
     }
@@ -243,14 +243,14 @@ pub trait Day {
         }
     }
 
-    fn run_part(&self, run_type: &RunType, part: &Part) -> RunResultType {
+    fn run_part(&self, run_type: &RunType, part: &Part) -> Vec<RunResultType> {
         match run_type {
             RunType::Test => self.run_tests(part),
-            RunType::Actual => self.run_real(part),
+            RunType::Actual => vec!(self.run_real(part)),
         }
     }
 
-    fn run_type(&self, run_type: &RunType) -> RunResultType {
+    fn run_type(&self, run_type: &RunType) -> Vec<RunResultType> {
         let YearDay { year, day } = self.get_year_and_date();
         let spacer = "=========";
         println!("{spacer} {year}, Day {day} ({run_type}) {spacer}");
@@ -267,11 +267,13 @@ pub trait Day {
         result
     }
 
-    fn run(&self) -> RunResultType {
-        let test = self.run_type(&RunType::Test);
-        println!();
-        let actual = self.run_type(&RunType::Actual);
+    fn run(&self) -> Vec<RunResultType> {
+        let mut results = Vec::new();
 
-        min(test, actual)
+        results.append(&mut self.run_type(&RunType::Test));
+        println!();
+        results.append(&mut self.run_type(&RunType::Actual));
+
+        results
     }
 }

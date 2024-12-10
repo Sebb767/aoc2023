@@ -9,7 +9,7 @@ use std::env;
 use std::time::Instant;
 use crate::day::{BoxedDay, RunResultType, YearDay};
 
-fn call_day(day: &BoxedDay) -> RunResultType
+fn call_day(day: &BoxedDay) -> Vec<RunResultType>
 {
     let YearDay { year: _, day: nday } = day.get_year_and_date();
     let start = Instant::now();
@@ -67,7 +67,7 @@ fn run_list(input: &HashMap<u16, Vec<BoxedDay>>) {
 
 fn run_days(days: &Vec<BoxedDay>) -> Vec<RunResultType> {
     let mut first = true;
-    let mut results = Vec::with_capacity(days.len());
+    let mut results = Vec::new();
 
     for day in days.iter() {
         if first {
@@ -75,8 +75,7 @@ fn run_days(days: &Vec<BoxedDay>) -> Vec<RunResultType> {
         } else {
             println!();
         }
-        let result = call_day(day);
-        results.push(result);
+        results.append(&mut call_day(day));
     }
 
     results
@@ -93,8 +92,8 @@ fn print_results(results: &Vec<RunResultType>) {
             map
         });
 
-    for (result, amount) in frequencies.iter() {
-        print!("{:?}={amount} ", result);
+    for key in [ RunResultType::Success, RunResultType::Unverified, RunResultType::Failed ] {
+        print!("{:?}={} ", key, frequencies.get(&key).unwrap());
     }
     println!();
 }

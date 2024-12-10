@@ -39,11 +39,11 @@ impl Day for Fallback {
         self.year_day
     }
 
-    fn run_part(&self, _: &RunType, _: &Part) -> RunResultType {
+    fn run_part(&self, _: &RunType, _: &Part) -> Vec<RunResultType> {
         unimplemented!();
     }
 
-    fn run_type(&self, run_type: &RunType) -> RunResultType {
+    fn run_type(&self, run_type: &RunType) -> Vec<RunResultType> {
         if *run_type == RunType::Test {
             unimplemented!()
         }
@@ -59,10 +59,10 @@ impl Day for Fallback {
         println!();
         println!("# day {day} {run_type} completed in {elapsed:.3}s");
         println!();
-        RunResultType::Unverified
+        vec!(RunResultType::Unverified)
     }
 
-    fn run(&self) -> RunResultType {
+    fn run(&self) -> Vec<RunResultType> {
         let result = self.run_type(&RunType::Actual);
         println!();
         result
