@@ -86,7 +86,7 @@ impl Day for Day8 {
     }
 
     fn get_expected_results(&self) -> ExpectedResults {
-        ExpectedResultMultipleTests!(vec!(14), 359, vec!(34, 9))
+        ExpectedResultMultipleTests!(vec!(14), 359, vec!(34, 9), 1293)
     }
 
     fn get_year_and_date(&self) -> YearDay {

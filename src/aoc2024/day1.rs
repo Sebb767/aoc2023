@@ -15,7 +15,7 @@ impl Day for Day1 {
     }
 
     fn get_expected_results(&self) -> ExpectedResults {
-        ExpectedResult!(0, 2375403, 0, 23082277)
+        ExpectedResult!(11, 2375403, 31, 23082277)
     }
 
     fn get_year_and_date(&self) -> YearDay {
