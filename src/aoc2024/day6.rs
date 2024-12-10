@@ -5,12 +5,11 @@ use crate::tools::{Direction, Matrix, Position};
 
 pub(crate) struct Day6;
 
-fn walk_matrix(matrix: &Matrix<char>) -> Option<HashSet<Position>> {
+fn walk_matrix(matrix: &Matrix<char>) -> Option<HashSet<(Position, Direction)>> {
     let mut position = matrix.find_first(&'^').unwrap();
     let mut direction = Direction::North;
-    let mut visited : HashSet<Position> = HashSet::new();
     let mut visited_dupe : HashSet<(Position, Direction)> = HashSet::new();
-    visited.insert(position.clone());
+    visited_dupe.insert((position.clone(), direction));
 
     while let Some(next) = matrix.checked_position_apply(&position, &direction.to_position_delta()) {
         let space = matrix.get_position(&next).unwrap();
@@ -25,7 +24,6 @@ fn walk_matrix(matrix: &Matrix<char>) -> Option<HashSet<Position>> {
                 }
             },
             &'.'|&'^' => {
-                visited.insert(next.clone());
                 if ! visited_dupe.insert((next.clone(), direction)) {
                     // dupe detected -> we have a loop!
                     return None;
@@ -39,32 +37,42 @@ fn walk_matrix(matrix: &Matrix<char>) -> Option<HashSet<Position>> {
         }
     }
 
-    Some(visited)
+    Some(visited_dupe)
+}
+
+fn unique_visited_locations(inp : HashSet<(Position, Direction)>) -> HashSet<Position> {
+    let mut rv = HashSet::new();
+    inp.iter().for_each(|(pos, _)| { rv.insert(pos.clone()); });
+    rv
 }
 
 impl Day for Day6 {
     fn part1(&self, input: String) -> Option<DayResult> {
         let matrix = Matrix::char_matrix_from_string(&input);
-        let visited = walk_matrix(&matrix).unwrap();
+        let visited = unique_visited_locations(walk_matrix(&matrix).unwrap());
 
         Some(visited.len() as DayResult)
     }
 
     fn part2(&self, input: String) -> Option<DayResult> {
-        let matrix = Matrix::char_matrix_from_string(&input);
-        let visited = walk_matrix(&matrix).unwrap();
+        let mut matrix = Matrix::char_matrix_from_string(&input);
+        let visited = unique_visited_locations(walk_matrix(&matrix).unwrap());
         let mut possible_loops = 0;
-        let startposition = matrix.find_first(&'^').unwrap();
+        let v_iter = visited.iter();
+        //let _start_position = v_iter.next().unwrap(); // we can't place a crate at the start
 
-        for pos in visited.iter() {
-            if *pos != startposition {
-                let mut mclone = matrix.clone();
-                *mclone.get_position_mut(&pos).unwrap() = '#';
-                if None == walk_matrix(&mclone) {
-                    // if it loops, we get none here
-                    possible_loops += 1;
-                }
+        for pos in v_iter {
+            let pref = matrix.get_position_mut(&pos).unwrap();
+            let old = *pref;
+            if old == '^' {
+                continue;
             }
+            *pref = '#';
+            if None == walk_matrix(&matrix) {
+                // if it loops, we get none here
+                possible_loops += 1;
+            }
+            *matrix.get_position_mut(&pos).unwrap() = old;
         }
 
         Some(possible_loops)
