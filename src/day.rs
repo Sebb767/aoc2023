@@ -147,6 +147,7 @@ pub trait Day {
         let mut suffixes = vec!(
             format!("day{day}-{part}.{run_type}-{index}.txt"),
             format!("day{day}-{part}.{run_type}.txt"),
+            format!("day{day}.{run_type}-{index}.txt"),
             format!("day{day}.{run_type}.txt"),
         );
 
