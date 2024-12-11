@@ -1,4 +1,4 @@
-use std::cmp::min;
+use std::cmp::{min, Ordering};
 use std::fmt::Display;
 use std::fs;
 use std::time::Instant;
@@ -7,7 +7,7 @@ pub type BoxedDay = Box<dyn Day>;
 
 pub type DayResult = i128;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, PartialOrd)]
 pub struct YearDay {
     pub year: u16,
     pub day: u16,
@@ -103,6 +103,18 @@ impl ExpectedResults {
 impl YearDay {
     pub fn y2024(day: u16) -> Self {
         YearDay { year: 2024, day }
+    }
+}
+
+impl Ord for YearDay {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let tmp = self.year.cmp(&other.year);
+        if tmp.is_eq() {
+            self.day.cmp(&other.day)
+        }
+        else {
+            tmp
+        }
     }
 }
 
