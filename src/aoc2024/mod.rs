@@ -1,5 +1,6 @@
 use std::vec;
 use crate::aoc2024::day10::Day10;
+use crate::aoc2024::day11::Day11;
 use crate::aoc2024::day1::Day1;
 use crate::aoc2024::day2::Day2;
 use crate::aoc2024::day3::Day3;
@@ -21,6 +22,7 @@ mod day7;
 mod day8;
 mod day9;
 mod day10;
+mod day11;
 
 pub fn get_days_adv() -> Vec<BoxedDay> {
     let days: Vec<BoxedDay> = vec!(
@@ -34,6 +36,7 @@ pub fn get_days_adv() -> Vec<BoxedDay> {
         Box::new(Day8),
         Box::new(Day9),
         Box::new(Day10),
+        Box::new(Day11),
     );
     days
 }
