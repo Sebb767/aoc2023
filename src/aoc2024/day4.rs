@@ -7,12 +7,12 @@ pub(crate) struct Day4;
 impl Day for Day4 {
     fn part1(&self, input: String) -> Option<DayResult> {
         let lines: Vec<&str> = input.lines().collect();
-        let chars: Vec<Vec<char>> = lines
+        let mut chars: Vec<Vec<char>> = lines
             .iter()
             .map(|line| line.chars().collect::<Vec<char>>())
             .collect();
 
-        let matrix = Matrix::create(chars);
+        let matrix = Matrix::create(&mut chars);
         let (xsize, ysize) = matrix.get_dimensions();
         let mut result = 0i128;
 
@@ -39,12 +39,12 @@ impl Day for Day4 {
 
     fn part2(&self, input: String) -> Option<DayResult> {
         let lines: Vec<&str> = input.lines().collect();
-        let chars: Vec<Vec<char>> = lines
+        let mut chars: Vec<Vec<char>> = lines
             .iter()
             .map(|line| line.chars().collect::<Vec<char>>())
             .collect();
 
-        let matrix = Matrix::create(chars);
+        let matrix = Matrix::create(&mut chars);
         let (xsize, ysize) = matrix.get_dimensions();
         let mut result = 0i128;
 
