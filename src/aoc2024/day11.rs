@@ -86,26 +86,7 @@ fn score(stone: &Stone, remaining_blinks: u32, mut cache: &mut HashMap<(Stone, u
     fscore
 }
 
-fn blink(row: &StoneRow) -> StoneRow {
-    let mut new_row = Vec::with_capacity(row.len() * 2);
-
-    for stone in row {
-        if stone == &0 {
-            new_row.push(1);
-        }
-        else if let Some((a, b)) = split(stone) {
-            new_row.push(a);
-            new_row.push(b);
-        }
-        else {
-            new_row.push(stone * 2024);
-        }
-    }
-
-    new_row
-}
-
-fn blink_multiple(mut row: StoneRow, blinks: u32) -> DayResult {
+fn blink_multiple(row: StoneRow, blinks: u32) -> DayResult {
     let mut cache = HashMap::new();
 
     row.iter().map(|s| score(s, blinks, &mut cache)).sum()
@@ -113,12 +94,12 @@ fn blink_multiple(mut row: StoneRow, blinks: u32) -> DayResult {
 
 impl Day for Day11 {
     fn part1(&self, input: String) -> Option<DayResult> {
-        let mut row : StoneRow = string_with_spaces_and_numbers_to_vec_of_numbers(&input).ok()?;
+        let row : StoneRow = string_with_spaces_and_numbers_to_vec_of_numbers(&input).ok()?;
         Some(blink_multiple(row, 25))
     }
 
     fn part2(&self, input: String) -> Option<DayResult> {
-        let mut row : StoneRow = string_with_spaces_and_numbers_to_vec_of_numbers(&input).ok()?;
+        let row : StoneRow = string_with_spaces_and_numbers_to_vec_of_numbers(&input).ok()?;
         Some(blink_multiple(row, 75))
     }
 
